@@ -1,9 +1,6 @@
 const MAIN_VOTING_CHART_DIV = 'sankey_voting'
 
-let yearDefined;
-let monthDefined;
-
-async function drawChart(year, month) {
+async function drawChart(datarows) {
     google.charts.load('current', {'packages':['sankey']})
     google.charts.setOnLoadCallback(drawSankeyChart)
 
@@ -17,15 +14,7 @@ async function drawChart(year, month) {
         data.addColumn('string', 'To');
         data.addColumn('number', 'Weight');
     
-        let datarows = []    
         let drawdata = []
-    
-        let dataFiles = await getDateMap()
-    
-        for await (const dataFile of dataFiles[yearDefined][monthDefined]) {
-            let res = await getDataFile(dataFile)
-            datarows.push(res)
-        }
     
         let categoryVoting = {}
       

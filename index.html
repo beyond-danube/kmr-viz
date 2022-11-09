@@ -36,7 +36,7 @@
         <div class="row">
             <div class="col">
                 <h1 class="display-1">Чим займається Київрада</h1>
-                <h4 class="display-6">На основі відкритх даних щодо <a href="https://kmr.gov.ua/uk/result_golosuvanya">поімених голосувань</a></h2>
+                <h4 class="display-4">На основі відкритх даних щодо <a href="https://kmr.gov.ua/uk/result_golosuvanya">поімених голосувань</a></h2>
             </div>
         </div>
         <div class="row">
@@ -45,13 +45,13 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-1">
+            <div class="col-md-2">
                 <select id="year" class="form-select">
                   <option selected>2021</option>
                   <option>2022</option>
                 </select>
             </div>
-            <div class="col-md-1">
+            <div class="col-md-2">
                 <select id="month" class="form-select">
                   <option>01</option>
                   <option selected>02</option>
@@ -67,7 +67,7 @@
                   <option>12</option>
                 </select>
             </div>
-            <div class="col-md-1">
+            <div class="col-md-2">
                 <button type="button" class="btn btn-primary" id="submit">Показати</button>
             </div>
         </div>
@@ -90,10 +90,29 @@
         console.log(selectedYear.value)
         console.log(selectedMonth.value)
 
-        window.addEventListener('load', async () => { await drawChart(selectedYear.value, selectedMonth.value) })
+        async function getDataForChart() {
+            let dataFiles = await getDateMap()
+
+            let datarows = []
+
+            for (let i = 0; i < dataFiles[selectedYear.value][selectedMonth.value].length; i++) {
+                let res = await getDataFile(dataFiles[selectedYear.value][selectedMonth.value][i])
+                datarows.push(res)
+
+                chart.innerHTML = `Завантажуємо рішення за період ${i}/${dataFiles[selectedYear.value][selectedMonth.value].length}`
+            }
+
+            return datarows
+        }
+
+        window.addEventListener('load', async () => { 
+            await drawChart(await getDataForChart()) 
+        
+        
+        })
         submitButton.addEventListener('click', async () => { 
             chart.innerHTML = ''
-            await drawChart(selectedYear.value, selectedMonth.value) 
+            await drawChart(await getDataForChart()) 
         })
         
 
