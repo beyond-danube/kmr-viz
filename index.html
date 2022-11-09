@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Візуалізація відкритих даних поіменних голосувань Київради</title>
+
+    <meta name="description" content="">
+    <meta name="robots" content="noindex, nofollow">
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+    <!-- <script src="js/config.js"></script> -->
+
+    <!-- <script src="js/drawing-constants.js"></script> -->
+    <script src="js/data-getter.js"></script>
+    <script src="js/chart-drawers.js"></script>
+    <script src="js/drawing-constants.js"></script>
+
+    <!-- <link rel="stylesheet" href="css/main.css"> -->
+
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;800&display=swap" rel="stylesheet">
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+
+</head>
+
+<body>
+
+    <div>
+        
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col">
+                <h1 class="display-1">Чим займається Київрада</h1>
+                <h4 class="display-6">На основі відкритх даних щодо <a href="https://kmr.gov.ua/uk/result_golosuvanya">поімених голосувань</a></h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div id="sankey_voting" style="height: 70vh;"></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-1">
+                <select id="year" class="form-select">
+                  <option selected>2021</option>
+                  <option>2022</option>
+                </select>
+            </div>
+            <div class="col-md-1">
+                <select id="month" class="form-select">
+                  <option>01</option>
+                  <option selected>02</option>
+                  <option>03</option>
+                  <option>04</option>
+                  <option>05</option>
+                  <option>06</option>
+                  <option>07</option>
+                  <option>08</option>
+                  <option>09</option>
+                  <option>10</option>
+                  <option>11</option>
+                  <option>12</option>
+                </select>
+            </div>
+            <div class="col-md-1">
+                <button type="button" class="btn btn-primary" id="submit">Показати</button>
+            </div>
+        </div>
+      </div>
+
+    
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+
+    <script>
+
+        let selectedYear = document.getElementById("year")
+        let selectedMonth = document.getElementById("month")
+
+        let submitButton = document.getElementById("submit")
+
+        let chart = document.getElementById("sankey_voting")
+            
+
+        console.log(selectedYear.value)
+        console.log(selectedMonth.value)
+
+        window.addEventListener('load', async () => { await drawChart(selectedYear.value, selectedMonth.value) })
+        submitButton.addEventListener('click', async () => { 
+            chart.innerHTML = ''
+            await drawChart(selectedYear.value, selectedMonth.value) 
+        })
+        
+
+    </script>
+</body>
+
+</html>
