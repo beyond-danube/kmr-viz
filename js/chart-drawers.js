@@ -23,10 +23,10 @@ async function drawChart(datarows) {
             let category = guessCategory(row.GL_Text)
     
             if(categoryVoting.hasOwnProperty(category)) {
-            categoryVoting[category].push(row)
+                categoryVoting[category].push(row)
             } else {
-            categoryVoting[category] = []
-            categoryVoting[category].push(row)
+                categoryVoting[category] = []
+                categoryVoting[category].push(row)
             }
             
         })
