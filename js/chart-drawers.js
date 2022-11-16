@@ -1,57 +1,40 @@
 const MAIN_VOTING_CHART_DIV = 'sankey_voting'
 
-async function drawChart(datarows) {
+function drawChart(datarows) {
     google.charts.load('current', {'packages':['sankey']})
     google.charts.setOnLoadCallback(drawSankeyChart)
 
     yearDefined = year
     monthDefined = month
 
-    async function drawSankeyChart() {
+    function drawSankeyChart() {
 
-        var data = new google.visualization.DataTable();
+        let data = new google.visualization.DataTable();
         data.addColumn('string', 'From');
         data.addColumn('string', 'To');
         data.addColumn('number', 'Weight');
     
         let drawdata = []
-    
-        let categoryVoting = {}
-      
-        datarows.forEach(row => {
-    
-            let category = guessCategory(row.GL_Text)
-    
-            if(categoryVoting.hasOwnProperty(category)) {
-                categoryVoting[category].push(row)
-            } else {
-                categoryVoting[category] = []
-                categoryVoting[category].push(row)
-            }
-            
-        })
-    
-        console.log(categoryVoting)
-    
+
+        let categoryVoting = getVotingResultsByCategory(datarows)
     
         for (const themeKey in themeToCategoryMap) {
             for (const categoryKey in categoryVoting) {
-            if(themeToCategoryMap[themeKey].includes(categoryKey)) {
-                drawdata.push( [ readableThemeMap[themeKey], categoryKey, 100* categoryVoting[categoryKey].length ] )
-            }
+                if(themeToCategoryMap[themeKey].includes(categoryKey)) {
+                    drawdata.push( [ readableThemeMap[themeKey], categoryKey, 100* categoryVoting[categoryKey].length ] )
+                }
             }
         }
     
         for (const categoryKey in categoryVoting) {
             for (const voteKey in voteOptions) {
-            drawdata.push([ categoryKey, voteOptions[voteKey], categoryVoting[categoryKey].map(e => e.DPList).flat().filter(g => g.DPGolos == voteOptions[voteKey]).length ])
+                drawdata.push([ categoryKey, voteOptions[voteKey], categoryVoting[categoryKey].map(e => e.DPList).flat().filter(g => g.DPGolos == voteOptions[voteKey]).length ])
             }
         }
     
         for (const resultKey in resultOptions) {
-            resultRows = datarows.filter(row => row.RESULT == resultOptions[resultOptions])
             for (const voteKey in voteOptions) {
-            drawdata.push( [ voteOptions[voteKey], resultOptions[resultKey], datarows.filter(row => row.RESULT == resultOptions[resultKey]).map(e => e.DPList).flat().filter(g => g.DPGolos == voteOptions[voteKey]).length ] )
+                drawdata.push( [ voteOptions[voteKey], resultOptions[resultKey], datarows.filter(row => row.RESULT == resultOptions[resultKey]).map(e => e.DPList).flat().filter(g => g.DPGolos == voteOptions[voteKey]).length ] )
             }
         }
     
@@ -64,9 +47,30 @@ async function drawChart(datarows) {
             height: Window.innerHeight
         };
     
-        var chart = new google.visualization.Sankey(document.getElementById(MAIN_VOTING_CHART_DIV));
+        let chart = new google.visualization.Sankey(document.getElementById(MAIN_VOTING_CHART_DIV));
         chart.draw(data);
     }
+}
+
+
+function getVotingResultsByCategory(data) {
+    
+    let result = {}
+    
+    data.forEach(row => {
+  
+        let category = guessCategory(row.GL_Text)
+  
+        if(result.hasOwnProperty(category)) {
+            result[category].push(row)
+        } else {
+            result[category] = []
+            result[category].push(row)
+        }
+        
+    })
+  
+    return result
 }
 
 function guessCategory(topic) {
@@ -179,4 +183,75 @@ function guessCategory(topic) {
 
 
     else return 'Інша категорія'
+}
+
+function drawVotePieChart(data, id) {
+
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(drawPieChartCallback);
+
+    function drawPieChartCallback() {
+
+        let dataElements = []
+
+        for (const voteKey in voteOptions) {
+
+            let total = 0
+
+            data.forEach(entry => total = total + entry[voteToCountMap[voteKey]])
+
+            dataElements.push([ voteOptions[voteKey], total ])
+        }
+
+
+        let drawdata = new google.visualization.DataTable();
+        drawdata.addColumn('string', 'Голос')
+        drawdata.addColumn('number', 'Число') 
+
+        drawdata.addRows(dataElements)
+
+        let options = {
+            pieHole: 0.4
+        }
+
+        var piechart = new google.visualization.PieChart(document.getElementById(id));
+        piechart.draw(drawdata, options);
+
+
+        console.log(drawdata)
+    }
+
+}
+
+function drawResultPieChart(data, id) {
+
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(drawPieChartCallback);
+
+    function drawPieChartCallback() {
+
+        let dataElements = []
+
+        for (const resultKey in resultOptions) {
+            dataElements.push([ resultOptions[resultKey], data.filter(res => res.RESULT === resultOptions[resultKey]).length ])
+        }
+
+
+        let drawdata = new google.visualization.DataTable();
+        drawdata.addColumn('string', 'Голос')
+        drawdata.addColumn('number', 'Число') 
+
+        drawdata.addRows(dataElements)
+
+        let options = {
+            pieHole: 0.4
+        }
+
+        var piechart = new google.visualization.PieChart(document.getElementById(id));
+        piechart.draw(drawdata, options);
+
+
+        console.log(drawdata)
+    }
+
 }

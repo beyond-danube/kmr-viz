@@ -10,9 +10,9 @@
     <!-- <script src="js/config.js"></script> -->
 
     <!-- <script src="js/drawing-constants.js"></script> -->
-    <script src="js/data-getter.js"></script>
-    <script src="js/chart-drawers.js"></script>
-    <script src="js/drawing-constants.js"></script>
+    <script type="text/javascript"  src="js/data-getter.js"></script>
+    <script type="text/javascript" src="js/chart-drawers.js"></script>
+    <script type="text/javascript" src="js/drawing-constants.js"></script>
 
     <!-- <link rel="stylesheet" href="css/main.css"> -->
 
@@ -30,8 +30,8 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col">
-                <h1 class="display-4">Чим займається Київрада</h1>
-                <p class="lead">На основі відкритих даних щодо <a href="https://kmr.gov.ua/uk/result_golosuvanya">поімених голосувань</a></p>
+                <h1>Чим займається Київрада</h1>
+                <p>На основі відкритих даних щодо <a href="https://kmr.gov.ua/uk/result_golosuvanya">поімених голосувань</a></p>
             </div>
         </div>
         <div class="row">
@@ -75,7 +75,7 @@
         </div>
         <div class="row">
             <div class="col">
-                <p class="lead">
+                <p>
                     — Що це за графіки?<br>
                     — Візуалізація відкритих даних щодо голосувань Київради<br>
                     — Як читати цю діаграму?<br>
@@ -87,11 +87,30 @@
                     — Які ваші висновки?<br>
                     — Загальний - інституція Київради в нинішньому форматі не має сенсу<br>
                     — Чому ви так вважаєте?<br>
-                    — Більшість тем голосувань - тема про земельні ділянки, кому що віддати в постійне користування, або в аренду. Це могла б робити компететна інституція, а не 125 людей які не розуміються на містобудуванні, урбаністиці та архітектурі. Натомість міські проєкти, такі як транспорт, обговорення забудови з громадськістю, соціальні та міські теми майже не фігурують у голосуваннях<br>
+                    — Більшість тем голосувань - тема про земельні ділянки, кому що віддати в постійне користування, або в аренду. Натомість міські проєкти, такі як транспорт, обговорення забудови з громадськістю, соціальні та міські теми майже не фігурують у голосуваннях<br>
                     — Зможете розповіти детальніше?<br>
                     — Так, нижче детальніша інформація та аналіз<br>
                 </p>
             </div>
+        </div>
+        <div class="row">
+            <div class="col"><h2>Детальніше</h1></div>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <h5>Всього голосів по всіх темах</h5>
+                <div id="votes-distributon"></div>
+            </div>
+            <div class="col-6">
+                <h5>Рішення за період</h5>
+                <div id="results-distributon"></div>
+            </div>
+        </div>
+        <div class="row">
+            <p>
+                Все, що винесене на голосування, майже ніколи не має голосів Проти<br>
+                Неприйнятиі рішення неприйняті не через те, що частина депутатів Київради проти, а через те, що хтось утримався, не голосував, або не прийшов
+            </p>
         </div>
     </div>
 
@@ -112,6 +131,10 @@
         let bar = document.getElementById("docs-loaded-progress-bar")
 
         let dataFiles
+
+        let votesByCategory
+
+        let datarows
             
 
         console.log(selectedYear.value)
@@ -133,7 +156,7 @@
             barContainer.hidden = false
             chart.innerHTML = ''
 
-            let datarows = []
+            datarows = []
 
             loadedDocs.total = dataFiles[selectedYear.value][selectedMonth.value].length
 
@@ -152,11 +175,27 @@
 
         window.addEventListener('load', async () => { 
             dataFiles = await getDateMap()
+            datarows = await getDataForChart(dataFiles)
 
-            await drawChart(await getDataForChart(dataFiles))
+            drawChart(datarows)
+
+            votesByCategory = getVotingResultsByCategory(datarows)
+
+            console.log(votesByCategory)
+
+            drawVotePieChart(datarows, "votes-distributon")
+            drawResultPieChart(datarows, "results-distributon")
         })
         submitButton.addEventListener('click', async () => {
-            await drawChart(await getDataForChart(dataFiles))
+            datarows = await getDataForChart(dataFiles)
+            drawChart(datarows)
+
+            votesByCategory = getVotingResultsByCategory(datarows)
+
+            console.log(votesByCategory)
+
+            drawVotePieChart(datarows, "votes-distributon")
+            drawResultPieChart(datarows, "results-distributon")
         })
         
 
