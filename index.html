@@ -9,6 +9,8 @@
 
     <!-- <script src="js/config.js"></script> -->
 
+    <link rel="stylesheet" href="css/style.css">
+
     <!-- <script src="js/drawing-constants.js"></script> -->
     <script type="text/javascript"  src="js/data-getter.js"></script>
     <script type="text/javascript" src="js/chart-drawers.js"></script>
@@ -17,8 +19,8 @@
     <!-- <link rel="stylesheet" href="css/main.css"> -->
 
 
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;800&display=swap" rel="stylesheet">
+    <!-- <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;800&display=swap" rel="stylesheet"> -->
 
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
@@ -97,13 +99,21 @@
             <div class="col"><h2>Детальніше</h1></div>
         </div>
         <div class="row">
-            <div class="col-6">
-                <h5>Всього голосів по всіх темах</h5>
-                <div id="votes-distributon"></div>
+            <div class="col-lg-3">
+                <h5>Всього голосів</h5>
+                <div id="votes-distributon" class="pie-chart"></div>
             </div>
-            <div class="col-6">
+            <div class="col-lg-3">
                 <h5>Рішення за період</h5>
-                <div id="results-distributon"></div>
+                <div id="results-distributon" class="pie-chart"></div>
+            </div>
+            <div class="col-lg-3">
+                <h5>Прийняті рішення</h5>
+                <div id="results-category-yes" class="pie-chart"></div>
+            </div>
+            <div class="col-lg-3">
+                <h5>Не прийняті рішення</h5>
+                <div id="results-category-no" class="pie-chart"></div>
             </div>
         </div>
         <div class="row">
@@ -135,10 +145,6 @@
         let votesByCategory
 
         let datarows
-            
-
-        console.log(selectedYear.value)
-        console.log(selectedMonth.value)
 
         let loadedDocs = { current: 0, total: 0 }
 
@@ -185,6 +191,8 @@
 
             drawVotePieChart(datarows, "votes-distributon")
             drawResultPieChart(datarows, "results-distributon")
+            drawThemeDecision(votesByCategory, "results-category-yes", resultOptions.YES)
+            drawThemeDecision(votesByCategory, "results-category-no", resultOptions.NO)
         })
         submitButton.addEventListener('click', async () => {
             datarows = await getDataForChart(dataFiles)
@@ -196,6 +204,8 @@
 
             drawVotePieChart(datarows, "votes-distributon")
             drawResultPieChart(datarows, "results-distributon")
+            drawThemeDecision(votesByCategory, "results-category-yes", resultOptions.YES)
+            drawThemeDecision(votesByCategory, "results-category-no", resultOptions.NO)
         })
         
 

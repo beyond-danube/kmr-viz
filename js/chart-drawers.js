@@ -1,5 +1,8 @@
 const MAIN_VOTING_CHART_DIV = 'sankey_voting'
 
+const DONUT_CHART_OPTIONS = {
+    pieHole: 0.4} 
+
 function drawChart(datarows) {
     google.charts.load('current', {'packages':['sankey']})
     google.charts.setOnLoadCallback(drawSankeyChart)
@@ -40,12 +43,6 @@ function drawChart(datarows) {
     
     
         data.addRows(drawdata);
-    
-        // Sets chart options.
-        var options = {
-            width: Window.innerWidth,
-            height: Window.innerHeight
-        };
     
         let chart = new google.visualization.Sankey(document.getElementById(MAIN_VOTING_CHART_DIV));
         chart.draw(data);
@@ -210,12 +207,8 @@ function drawVotePieChart(data, id) {
 
         drawdata.addRows(dataElements)
 
-        let options = {
-            pieHole: 0.4
-        }
-
         var piechart = new google.visualization.PieChart(document.getElementById(id));
-        piechart.draw(drawdata, options);
+        piechart.draw(drawdata, DONUT_CHART_OPTIONS);
 
 
         console.log(drawdata)
@@ -243,15 +236,40 @@ function drawResultPieChart(data, id) {
 
         drawdata.addRows(dataElements)
 
-        let options = {
-            pieHole: 0.4
+        var piechart = new google.visualization.PieChart(document.getElementById(id));
+        piechart.draw(drawdata, DONUT_CHART_OPTIONS);
+    }
+
+}
+
+
+function drawThemeDecision(data, id, decision) {
+
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(drawDecisionCallback);
+
+    function drawDecisionCallback() {
+
+        let dataElements = []
+
+        for (const theme in themeToCategoryMap) {
+
+            let total = 0
+
+            themeToCategoryMap[theme].forEach(themeItem => data.hasOwnProperty(themeItem) ? total = total + data[themeItem].filter(item => item.RESULT === decision).length : total = total)
+
+            dataElements.push( [ readableThemeMap[theme], total ] )
+
         }
 
+        let drawdata = new google.visualization.DataTable();
+        drawdata.addColumn('string', 'Тема')
+        drawdata.addColumn('number', 'Число') 
+
+        drawdata.addRows(dataElements)
+
         var piechart = new google.visualization.PieChart(document.getElementById(id));
-        piechart.draw(drawdata, options);
-
-
-        console.log(drawdata)
+        piechart.draw(drawdata, DONUT_CHART_OPTIONS);
     }
 
 }
