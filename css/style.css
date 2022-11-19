@@ -1,3 +1,23 @@
 .pie-chart {
     height: 30vh;
 }
+
+@media only screen and (max-width: 600px) {
+    .pie-chart {height: 10vh;}
+}
+  
+@media only screen and (min-width: 600px) {
+    .pie-chart {height: 10vh;}
+}
+
+@media only screen and (min-width: 768px) {
+    .pie-chart {height: 20vh;}
+} 
+
+@media only screen and (min-width: 992px) {
+    .pie-chart {height: 30vh;}
+} 
+
+@media only screen and (min-width: 1200px) {
+    .pie-chart {height: 30vh;}
+}
