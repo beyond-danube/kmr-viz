@@ -102,7 +102,12 @@
             </div>
         </div>
         <div class="row">
-            <div class="col"><h2>Детальніше про голосування на рішення</h1></div>
+            <div class="col">
+                <h2>Детальніше про голосування на рішення</h1></div>
+                <p>
+                    Все, що винесене на голосування, майже ніколи не має голосів Проти<br>
+                    Неприйнятиі рішення неприйняті не через те, що частина депутатів Київради проти, а через те, що хтось утримався, не голосував, або не прийшов
+                </p>
         </div>
         <div class="row">
             <div class="col-lg-6">
@@ -122,12 +127,26 @@
                 <div id="results-distributon" class="pie-chart"></div>
             </div>
         </div>
-        <div class="row">
-            <p>
-                Все, що винесене на голосування, майже ніколи не має голосів Проти<br>
-                Неприйнятиі рішення неприйняті не через те, що частина депутатів Київради проти, а через те, що хтось утримався, не голосував, або не прийшов
-            </p>
+    </div>
+    <div class="container-fluid">
+        <div class="container">
+            <h1>Всі рішення списком</h1>
         </div>
+        <table class="table table-striped table-hover table-fixed-head">
+            <thead style="height: 150px">
+              <tr>
+                <th scope="col-6">Питання</th>
+                <th scope="col-1" class="rotate"><div><span>За</span></div></th>
+                <th scope="col-1" class="rotate"><div><span>Проти</span></div></th>
+                <th scope="col-1" class="rotate"><div><span>Утримався</span></div></th>
+                <th scope="col-1" class="rotate"><div><span>Не голосував</span></div></th>
+                <th scope="col-1" class="rotate"><div><span>Відсутній</span></div></th>
+                <th scope="col-1" class="rotate"><div><span>Рішення</span></div></th>
+              </tr>
+            </thead>
+            <tbody id="one">
+            </tbody>
+          </table>
     </div>
 
     
@@ -199,6 +218,8 @@
             drawResultPieChart(datarows, "results-distributon")
             drawThemeDecision(votesByCategory, "results-category-yes", resultOptions.YES)
             drawThemeDecision(votesByCategory, "results-category-no", resultOptions.NO)
+
+            addRows(datarows)
         })
         submitButton.addEventListener('click', async () => {
             datarows = await getDataForChart(dataFiles)
@@ -213,6 +234,30 @@
             drawThemeDecision(votesByCategory, "results-category-yes", resultOptions.YES)
             drawThemeDecision(votesByCategory, "results-category-no", resultOptions.NO)
         })
+
+        function addRows(datarows) {
+            let table = document.getElementById("one")
+
+            datarows.forEach(datarow => {
+
+                let row = document.createElement("tr")
+
+                appendRowItems(row, [ datarow.GL_Text, datarow.YESCnt, datarow.NOCnt, datarow.UTRCnt, datarow.NGCnt, datarow.ABSCnt, datarow.RESULT === resultOptions.YES ? '✅' : '❌' ])
+
+                table.appendChild(row)
+                
+            })
+        }
+
+        function appendRowItems(element, values) {
+
+            values.forEach(value => {
+                let rowEntry = document.createElement("td")
+                rowEntry.innerText = value
+
+                element.appendChild(rowEntry)
+            })
+        }
         
 
     </script>
