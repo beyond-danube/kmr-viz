@@ -128,7 +128,7 @@
             </div>
         </div>
     </div>
-    <div class="container-fluid">
+    <div class="container-fluid" id="details-tables">
         <div class="container">
             <h1>Всі рішення списком</h1>
         </div>
@@ -146,7 +146,7 @@
             </thead>
             <tbody id="one">
             </tbody>
-          </table>
+        </table>
     </div>
 
     
@@ -233,6 +233,11 @@
             drawResultPieChart(datarows, "results-distributon")
             drawThemeDecision(votesByCategory, "results-category-yes", resultOptions.YES)
             drawThemeDecision(votesByCategory, "results-category-no", resultOptions.NO)
+
+            let table = document.getElementById("one")
+            table.innerHTML = ''
+
+            addRows(datarows)
         })
 
         function addRows(datarows) {
