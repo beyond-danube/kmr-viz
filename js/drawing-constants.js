@@ -11,6 +11,14 @@ const voteOptions = {
     NO_SHOW: 'Відсутній'
 }
 
+const voteOptionsEmoji = {
+    YES: '🙋‍♂️',
+    NO: '🙅‍♀️',
+    NO_VOTE: '🤷',
+    DID_NOT_VOTE: '👤',
+    NO_SHOW: '🥷'
+}
+
 const voteToCountMap = {
     YES: 'YESCnt',
     NO: 'NOCnt',

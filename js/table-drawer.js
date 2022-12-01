@@ -21,7 +21,7 @@ function createTable(id, name) {
         let column = document.createElement('th')
         column.setAttribute('scope', 'col')
         column.setAttribute('class', 'rotate')
-        column.innerHTML = `<div><span>${voteOptions[voteOption]}</span><div>`
+        column.innerHTML = voteOptionsEmoji[voteOption]
 
         headTr.appendChild(column)
     }
@@ -29,7 +29,7 @@ function createTable(id, name) {
     let resultColumn = document.createElement('th')
     resultColumn.setAttribute('scope', 'col')
     resultColumn.setAttribute('class', 'rotate')
-    resultColumn.innerHTML = `<div><span>Рішення</span><div>`
+    resultColumn.innerHTML = '📑'
     headTr.appendChild(resultColumn)
 
 

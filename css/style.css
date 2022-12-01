@@ -2,24 +2,11 @@
     height: 30vh;
 }
 
-.table-header {
-    height: 150px;
+.table-fixed-head thead th { 
+    position: sticky; 
+    top: 0; z-index: 1; 
+    background-color: whitesmoke; 
 }
-
-th.rotate {
-    white-space: nowrap;
-    position: relative;
-}
-  
-th.rotate > div {
-    transform: rotate(-90deg);
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 100px;    
-}
-
-.table-fixed-head thead th { position: sticky; top: 0; z-index: 1; background-color: whitesmoke; }
 
 @media only screen and (max-width: 600px) {
     .pie-chart {height: 10vh;}
