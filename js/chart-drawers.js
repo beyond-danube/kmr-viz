@@ -3,7 +3,7 @@ const MAIN_VOTING_CHART_DIV = 'sankey_voting'
 const DONUT_CHART_OPTIONS = {
     pieHole: 0.4} 
 
-function drawChart(datarows) {
+function drawChart(categoryVoting) {
     google.charts.load('current', {'packages':['sankey']})
     google.charts.setOnLoadCallback(drawSankeyChart)
 
@@ -19,7 +19,6 @@ function drawChart(datarows) {
     
         let drawdata = []
 
-        let categoryVoting = getVotingResultsByCategory(datarows)
     
         for (const themeKey in themeToCategoryMap) {
             for (const categoryKey in categoryVoting) {

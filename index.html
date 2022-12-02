@@ -202,9 +202,10 @@
             dataFiles = await getDateMap()
             datarows = await getDataForChart(dataFiles)
 
-            drawChart(datarows)
+            
 
             votesByCategory = getVotingResultsByCategory(datarows)
+            drawChart(votesByCategory)
 
             console.log(votesByCategory)
 
@@ -217,9 +218,10 @@
         })
         submitButton.addEventListener('click', async () => {
             datarows = await getDataForChart(dataFiles)
-            drawChart(datarows)
+            
 
             votesByCategory = getVotingResultsByCategory(datarows)
+            drawChart(votesByCategory)
 
             console.log(votesByCategory)
 
