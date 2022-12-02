@@ -10,5 +10,5 @@ async function getDateMap() {
 }
 
 async function getDataFile(fileName) {
-    return await fetchData(`https://raw.githubusercontent.com/beyond-danube/kmr-data/main/data-final/${fileName}`)
+    return await fetchData(`${BASE_URL}data-final-lite/${fileName}`)
 }

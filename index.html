@@ -202,8 +202,6 @@
             dataFiles = await getDateMap()
             datarows = await getDataForChart(dataFiles)
 
-            
-
             votesByCategory = getVotingResultsByCategory(datarows)
             drawChart(votesByCategory)
 
@@ -217,8 +215,7 @@
             createThemeTables(votesByCategory)
         })
         submitButton.addEventListener('click', async () => {
-            datarows = await getDataForChart(dataFiles)
-            
+            datarows = await getDataForChart(dataFiles)            
 
             votesByCategory = getVotingResultsByCategory(datarows)
             drawChart(votesByCategory)
