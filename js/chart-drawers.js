@@ -34,7 +34,7 @@ function drawChart(datarows) {
                 drawdata.push([ categoryKey, voteOptions[voteKey], categoryVoting[categoryKey].map(e => e.DPList).flat().filter(g => g.DPGolos == voteOptions[voteKey]).length ])
             }
         }
-    
+
         for (const resultKey in resultOptions) {
             for (const voteKey in voteOptions) {
                 drawdata.push( [ voteOptions[voteKey], resultOptions[resultKey], datarows.filter(row => row.RESULT == resultOptions[resultKey]).map(e => e.DPList).flat().filter(g => g.DPGolos == voteOptions[voteKey]).length ] )
@@ -98,6 +98,8 @@ function guessCategory(topic) {
     else if (topic.includes('За перерву в пленарному засіданні')) return 'Порядок денний: прийняття, зміни, тощо'
     else if (topic.includes('За розділ') && topic.includes('порядку денного')) return 'Порядок денний: прийняття, зміни, тощо'
     else if (topic.includes('За зняття') && topic.includes('питань порядку денного')) return 'Порядок денний: прийняття, зміни, тощо'
+    else if (topic.includes('За виключення питання порядку денного')) return 'Порядок денний: прийняття, зміни, тощо'
+    else if (topic.includes('За виключення з порядку денного')) return 'Порядок денний: прийняття, зміни, тощо'
      
     
     else if (topic.includes('Про внесення змін')) return 'Внесення змін у попередні рішення'
@@ -179,6 +181,11 @@ function guessCategory(topic) {
     else if (topic.includes('затвердження') && topic.includes('цільової програми')) return 'Міські цільові програми'
 
 
+
+    // Перейменування
+    else if (topic.includes('перейменування вулиці') || topic.includes('перейменування площі') || topic.includes('перейменування бульвару') || topic.includes('перейменування провулку') || topic.includes('перейменування проспекту')) return 'Перейменування'
+
+
     else return 'Інша категорія'
 }
 
@@ -209,9 +216,6 @@ function drawVotePieChart(data, id) {
 
         var piechart = new google.visualization.PieChart(document.getElementById(id));
         piechart.draw(drawdata, DONUT_CHART_OPTIONS);
-
-
-        console.log(drawdata)
     }
 
 }
