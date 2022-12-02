@@ -24,20 +24,42 @@ function drawChart(datarows) {
         for (const themeKey in themeToCategoryMap) {
             for (const categoryKey in categoryVoting) {
                 if(themeToCategoryMap[themeKey].includes(categoryKey)) {
-                    drawdata.push( [ readableThemeMap[themeKey], categoryKey, 100* categoryVoting[categoryKey].length ] )
+                    drawdata.push( [ readableThemeMap[themeKey], categoryKey, 100 * categoryVoting[categoryKey].length ] )
                 }
             }
         }
     
         for (const categoryKey in categoryVoting) {
             for (const voteKey in voteOptions) {
-                drawdata.push([ categoryKey, voteOptions[voteKey], categoryVoting[categoryKey].map(e => e.DPList).flat().filter(g => g.DPGolos == voteOptions[voteKey]).length ])
+
+                let count = 0;
+                categoryVoting[categoryKey].forEach(item => { 
+                    count = count + item[voteToCountMap[voteKey]]
+                })
+
+                drawdata.push([ categoryKey, voteOptions[voteKey], count ])
             }
         }
 
+        // Back to flat view
+        let flatRows = []
+
+        for (const categoryKey in categoryVoting) {
+            (categoryVoting[categoryKey]).forEach(item => flatRows.push(item))
+        }
+
+
         for (const resultKey in resultOptions) {
             for (const voteKey in voteOptions) {
-                drawdata.push( [ voteOptions[voteKey], resultOptions[resultKey], datarows.filter(row => row.RESULT == resultOptions[resultKey]).map(e => e.DPList).flat().filter(g => g.DPGolos == voteOptions[voteKey]).length ] )
+
+                let count = 0
+                let filteredArray = flatRows.filter(row => row.RESULT == resultOptions[resultKey])
+
+                filteredArray.forEach(item => {
+                    count = count + item[voteToCountMap[voteKey]]
+                })
+
+                drawdata.push( [ voteOptions[voteKey], resultOptions[resultKey], count ] )
             }
         }
     
