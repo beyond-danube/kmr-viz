@@ -69,7 +69,7 @@ function addRows(tableId, datarows) {
 
         let row = document.createElement("tr")
 
-        appendRowItems(row, [ datarow.GL_Text, datarow.YESCnt, datarow.NOCnt, datarow.UTRCnt, datarow.NGCnt, datarow.ABSCnt, datarow.RESULT === resultOptions.YES ? '✅' : '❌' ])
+        appendRowItems(row, [ getResultTextWithLinks(datarow.GL_Text), datarow.YESCnt, datarow.NOCnt, datarow.UTRCnt, datarow.NGCnt, datarow.ABSCnt, datarow.RESULT === resultOptions.YES ? '✅' : '❌' ])
 
         table.appendChild(row)
         
@@ -80,10 +80,32 @@ function appendRowItems(element, values) {
 
     values.forEach(value => {
         let rowEntry = document.createElement("td")
-        rowEntry.innerText = value
+        rowEntry.innerHTML = value
 
         element.appendChild(rowEntry)
     })
+}
+
+function getResultTextWithLinks(str) {
+    const baseGoogleUrl = 'https://www.google.com/search?q='
+
+    const company = new RegExp(/\«(?!Про)(?!про)[^»*]{2,}\»/g)
+    const docId = new RegExp(/\([0-9]+\)/g)
+    const docDate = new RegExp(/\(Від [0-9]*\.[0-9]*\.[0-9]*.№.[0-9]*\/[0-9]*-[0-9]*\/ПР\)/g)
+
+    function makeCompanyGoogleLinks(match) {
+        return `<a href=${encodeURI(`${baseGoogleUrl}"${match.replace('»', '').replace('«', '')}"`)} target="_blank">${match}</a>`
+    }
+
+    function makeDocsGoogleLinks(match) {
+        let removedBrackets = match.substring(1, match.length - 1)
+        let br1 = match.charAt(0)
+        let br2 = match.charAt(match.length - 1)
+
+        return `${br1}<a href=${encodeURI(`${baseGoogleUrl}"${removedBrackets}"`)} target="_blank">${removedBrackets}</a>${br2}`
+    }
+
+    return str.replace(company, makeCompanyGoogleLinks).replace(docId, makeDocsGoogleLinks).replace(docDate, makeDocsGoogleLinks)
 }
 
 function createThemeTables(votesByCategory) {
