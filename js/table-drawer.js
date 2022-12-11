@@ -89,7 +89,19 @@ function appendRowItems(element, values) {
 function getResultTextWithLinks(str) {
     const baseGoogleUrl = 'https://www.google.com/search?q='
 
+    // We're trying to guess company by «» so that e.g. «ФАРМКАК» is a company. 
+    // We skip 1-character string in such quotation marks, since it mightbe building number, 
+    // and all the sthings strating with «про» since that might be document name, not company
+    //
+    // Example
+    // Про затвердження найменування товарів, послуг, які надаються безоплатно Ритуальною службою спеціалізованого 
+    // комунального підприємства «Спеціалізований комбінат підприємств комунально-побутового обслуговування» виконавчого 
+    // органу Київради (Київської міської державної адміністрації) та Ритуальною службою спеціалізованого комунального 
+    // підприємства «Київський крематорій» виконавчого органу Київради (Київської міської державної адміністрації) при 
+    // похованні категорій осіб, передбачених пунктами «в» і «г» частини першої статті 14 Закону України
+    // «Про поховання та похоронну справу». (Від 15.08.2022 № 08/231-988/ПР)
     const company = new RegExp(/\«(?!Про)(?!про)[^»*]{2,}\»/g)
+
     const docId = new RegExp(/\([0-9]+\)/g)
     const docDate = new RegExp(/\(Від [0-9]*\.[0-9]*\.[0-9]*.№.[0-9]*\/[0-9]*-[0-9]*\/ПР\)/g)
 
