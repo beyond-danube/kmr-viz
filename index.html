@@ -88,6 +88,14 @@
                 <button type="button" class="btn btn-primary" id="submit">Показати</button>
             </div>
         </div>
+        <div class="row row mb-4">
+            <div class="col">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="hideTechWorkCheckbox">
+                    <label class="form-check-label" for="hideTechWorkCheckbox">Не показувати технічну роботу</label>
+                </div>
+            </div>
+        </div>
         <div class="row">
             <div class="col">
                 <p>
@@ -167,6 +175,8 @@
 
         let loadedDocs = { current: 0, total: 0 }
 
+        let checkbox = document.getElementById("hideTechWorkCheckbox")
+
         function drawLoadProgress() {
             if(loadedDocs.current < loadedDocs.total) {
                 bar.style.width = `${loadedDocs.current/loadedDocs.total*100}%`
@@ -218,6 +228,15 @@
             datarows = await getDataForChart(dataFiles)            
 
             votesByCategory = getVotingResultsByCategory(datarows)
+
+            if(checkbox.checked) {
+                themeToCategoryMap.ORG.forEach(categoty => {
+                    if(votesByCategory.hasOwnProperty(categoty)) {
+                        delete votesByCategory[categoty]
+                    }
+                })
+            }
+
             drawChart(votesByCategory)
 
             console.log(votesByCategory)
