@@ -7,9 +7,6 @@ function drawChart(categoryVoting) {
     google.charts.load('current', {'packages':['sankey']})
     google.charts.setOnLoadCallback(drawSankeyChart)
 
-    yearDefined = year
-    monthDefined = month
-
     function drawSankeyChart() {
 
         let data = new google.visualization.DataTable();

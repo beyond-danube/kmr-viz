@@ -61,7 +61,7 @@
         </div>
     </div>
     <div class="container mt-3">
-        <div class="row mb-4">
+        <!-- <div class="row mb-4">
             <div class="col-2">
                 <select id="year" class="form-select">
                   <option selected>2021</option>
@@ -70,6 +70,57 @@
             </div>
             <div class="col-2">
                 <select id="month" class="form-select">
+                  <option>01</option>
+                  <option selected>02</option>
+                  <option>03</option>
+                  <option>04</option>
+                  <option>05</option>
+                  <option>06</option>
+                  <option>07</option>
+                  <option>08</option>
+                  <option>09</option>
+                  <option>10</option>
+                  <option>11</option>
+                  <option>12</option>
+                </select>
+            </div>
+            <div class="col-2">
+                <button type="button" class="btn btn-primary" id="submit">Показати</button>
+            </div>
+        </div> -->
+        <div class="row mb-4">
+            <div class="col-2">
+                <select id="year-from" class="form-select">
+                  <option selected>2021</option>
+                  <option>2022</option>
+                </select>
+            </div>
+            <div class="col-2">
+                <select id="month-from" class="form-select">
+                  <option>01</option>
+                  <option selected>02</option>
+                  <option>03</option>
+                  <option>04</option>
+                  <option>05</option>
+                  <option>06</option>
+                  <option>07</option>
+                  <option>08</option>
+                  <option>09</option>
+                  <option>10</option>
+                  <option>11</option>
+                  <option>12</option>
+                </select>
+            </div>
+            <div class="col-1">
+            </div>
+            <div class="col-2">
+                <select id="year-to" class="form-select">
+                  <option selected>2021</option>
+                  <option>2022</option>
+                </select>
+            </div>
+            <div class="col-2">
+                <select id="month-to" class="form-select">
                   <option>01</option>
                   <option selected>02</option>
                   <option>03</option>
@@ -160,6 +211,12 @@
         let selectedYear = document.getElementById("year")
         let selectedMonth = document.getElementById("month")
 
+        let selectedYearFrom = document.getElementById("year-from")
+        let selectedMonthFrom = document.getElementById("month-from")
+
+        let selectedYearTo = document.getElementById("year-to")
+        let selectedMonthTo = document.getElementById("month-to")
+
         let submitButton = document.getElementById("submit")
 
         let chart = document.getElementById("sankey_voting")
@@ -186,6 +243,70 @@
             setTimeout("drawLoadProgress()", 300);
         }
 
+        // TODO: make it less tricky
+        async function getDataForChartRange() {
+
+            barContainer.hidden = false
+            chart.innerHTML = ''
+
+            loadedDocs.current = 0
+
+            datarows = []
+
+            let dataFilesToGet = []
+
+            if(selectedYearFrom.value == selectedYearTo.value) {
+
+                let values = dataFiles[selectedYearFrom.value]
+
+                for (const month in values) {
+                    if ((parseInt(month) >= parseInt(selectedMonthFrom.value)) && (parseInt(month) <= parseInt(selectedMonthTo.value))) {
+                        values[month].forEach(document => dataFilesToGet.push(document))               
+                    }
+                }
+            } else {
+                for (const year in dataFiles) {
+                    // if (parseInt(year) == parseInt(selectedYearFrom.value)) {
+                    //     dataFiles[year].forEach(month => {
+                    //         if(parseInt(month) >= selectedMonthFrom) {
+                    //             dataFiles[year][month].forEach(document => dataFilesToGet.push(document))
+                    //         }
+                    //     })
+                    // }
+
+                    if (parseInt(year) == parseInt(selectedYearFrom.value)) {
+                        for (const month in dataFiles[year]) {
+                            if(parseInt(month) >= selectedMonthFrom.value) {
+                                dataFiles[year][month].forEach(document => dataFilesToGet.push(document))
+                            }
+                        }
+                    }
+                    else if (parseInt(year) == parseInt(selectedYearTo.value)) {
+                        for (const month in dataFiles[year]) {
+                            if(parseInt(month) <= selectedMonthTo.value) {
+                                dataFiles[year][month].forEach(document => dataFilesToGet.push(document))
+                            }
+                        }
+                    }
+                    else {
+                        for (const month in dataFiles[year]) {
+                            dataFiles[year][month].forEach(document => dataFilesToGet.push(document))
+                        }                    
+                    }
+                }
+            }
+
+            loadedDocs.total = dataFilesToGet.length
+
+            drawLoadProgress()
+
+            for (const document of dataFilesToGet) {
+                await getDataFile(document).then(res => datarows.push(res)).then(() => loadedDocs.current++) 
+            }
+
+            barContainer.hidden = true
+        }
+
         async function getDataForChart() {
 
             barContainer.hidden = false
@@ -208,7 +329,7 @@
 
         window.addEventListener('load', async () => { 
             dataFiles = await getDateMap()
-            await getDataForChart()
+            await getDataForChartRange()
 
             votesByCategory = getVotingResultsByCategory(datarows)
             drawChart(votesByCategory)
@@ -224,7 +345,7 @@
         })
 
         submitButton.addEventListener('click', async () => {
-            await getDataForChart()
+            await getDataForChartRange()
 
             votesByCategory = getVotingResultsByCategory(datarows)
 
