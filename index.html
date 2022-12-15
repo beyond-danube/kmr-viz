@@ -191,26 +191,24 @@
             barContainer.hidden = false
             chart.innerHTML = ''
 
+            loadedDocs.current = 0
+
             datarows = []
 
             loadedDocs.total = dataFiles[selectedYear.value][selectedMonth.value].length
 
             drawLoadProgress()
 
-            for (let i = 0; i < dataFiles[selectedYear.value][selectedMonth.value].length; i++) {
-                let res = await getDataFile(dataFiles[selectedYear.value][selectedMonth.value][i])
-                datarows.push(res)
-
-                loadedDocs.current = i
+            for (const document of dataFiles[selectedYear.value][selectedMonth.value]) {
+                await getDataFile(document).then(res => datarows.push(res)).then(() => loadedDocs.current++) 
             }
 
             barContainer.hidden = true
-            return datarows
         }
 
         window.addEventListener('load', async () => { 
             dataFiles = await getDateMap()
-            datarows = await getDataForChart(dataFiles)
+            await getDataForChart()
 
             votesByCategory = getVotingResultsByCategory(datarows)
             drawChart(votesByCategory)
@@ -224,8 +222,9 @@
 
             createThemeTables(votesByCategory)
         })
+
         submitButton.addEventListener('click', async () => {
-            datarows = await getDataForChart(dataFiles)            
+            await getDataForChart()
 
             votesByCategory = getVotingResultsByCategory(datarows)
 
