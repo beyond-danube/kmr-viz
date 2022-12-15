@@ -38,30 +38,6 @@ function createTable(id, name) {
     table.appendChild(tableBody)
 }
 
-// function createMainHeader(headerValue) {
-//     let parentDiv = document.getElementById('details-tables')
-
-//     let container = document.createElement('div')
-//     container.setAttribute('class', 'container')
-//     parentDiv.appendChild(container)
-
-//     let header = document.createElement('h2')
-//     header.innerText = headerValue
-//     container.appendChild(header)
-// }
-
-// function createSubHeader(headerValue) {
-//     let parentDiv = document.getElementById('details-tables')
-
-//     let container = document.createElement('div')
-//     container.setAttribute('class', 'container')
-//     parentDiv.appendChild(container)
-
-//     let header = document.createElement('h4')
-//     header.innerText = headerValue
-//     container.appendChild(header)
-// }
-
 function addRows(tableId, datarows) {
     let table = document.getElementById(tableId)
 
