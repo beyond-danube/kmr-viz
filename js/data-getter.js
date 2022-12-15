@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost/kmr-data/'
+const BASE_URL = 'https://raw.githubusercontent.com/beyond-danube/kmr-data/main/'
 
 async function fetchData(path) {
     let response = await fetch(path)
