@@ -300,9 +300,25 @@
 
             drawLoadProgress()
 
+            let promises = []
+
             for (const document of dataFilesToGet) {
-                await getDataFile(document).then(res => datarows.push(res)).then(() => loadedDocs.current++) 
+                promises.push(getDataFile(document))
             }
+
+            const handleProgress = (result) => {
+                loadedDocs.current++
+                return result;
+            }
+
+            // await Promise.all(promises).then(results => { 
+            //     results.forEach(res => datarows.push(res))  
+            // })
+
+            await Promise.all(promises.map(p => p.then(handleProgress))).then(results => { 
+                results.forEach(res => datarows.push(res))    
+            })
+
 
             barContainer.hidden = true
         }
