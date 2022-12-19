@@ -240,7 +240,7 @@
                 bar.innerText = `${loadedDocs.current}/${loadedDocs.total}`
             }
 
-            setTimeout("drawLoadProgress()", 300);
+            setTimeout("drawLoadProgress()", 10);
         }
 
         // TODO: make it less tricky
@@ -261,7 +261,7 @@
 
                 for (const month in values) {
                     if ((parseInt(month) >= parseInt(selectedMonthFrom.value)) && (parseInt(month) <= parseInt(selectedMonthTo.value))) {
-                        values[month].forEach(document => dataFilesToGet.push(document))               
+                        dataFilesToGet.push(values[month])
                     }
                 }
             } else {
@@ -277,20 +277,20 @@
                     if (parseInt(year) == parseInt(selectedYearFrom.value)) {
                         for (const month in dataFiles[year]) {
                             if(parseInt(month) >= selectedMonthFrom.value) {
-                                dataFiles[year][month].forEach(document => dataFilesToGet.push(document))
+                                dataFilesToGet.push(dataFiles[year][month])
                             }
                         }
                     }
                     else if (parseInt(year) == parseInt(selectedYearTo.value)) {
                         for (const month in dataFiles[year]) {
                             if(parseInt(month) <= selectedMonthTo.value) {
-                                dataFiles[year][month].forEach(document => dataFilesToGet.push(document))
+                                dataFilesToGet.push(dataFiles[year][month])
                             }
                         }
                     }
                     else {
                         for (const month in dataFiles[year]) {
-                            dataFiles[year][month].forEach(document => dataFilesToGet.push(document))
+                            dataFilesToGet.push(dataFiles[year][month])
                         }                    
                     }
                 }
@@ -303,7 +303,7 @@
             let promises = []
 
             for (const document of dataFilesToGet) {
-                promises.push(getDataFile(document))
+                promises.push(getMonthDataFile(document))
             }
 
             const handleProgress = (result) => {
@@ -311,12 +311,8 @@
                 return result;
             }
 
-            // await Promise.all(promises).then(results => { 
-            //     results.forEach(res => datarows.push(res))  
-            // })
-
             await Promise.all(promises.map(p => p.then(handleProgress))).then(results => { 
-                results.forEach(res => datarows.push(res))    
+                results.forEach(res => res.forEach(entry => datarows.push(entry)))    
             })
 
 
@@ -344,7 +340,7 @@
         }
 
         window.addEventListener('load', async () => { 
-            dataFiles = await getDateMap()
+            dataFiles = await getDateMapByMonth()
             await getDataForChartRange()
 
             votesByCategory = getVotingResultsByCategory(datarows)
