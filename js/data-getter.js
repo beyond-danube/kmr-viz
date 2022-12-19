@@ -9,6 +9,14 @@ async function getDateMap() {
     return await fetchData(BASE_URL + 'date-files-map/date-map.json')
 }
 
+async function getDateMapByMonth() {
+    return await fetchData(BASE_URL + 'date-files-map/date-map-month.json')
+}
+
 async function getDataFile(fileName) {
     return await fetchData(`${BASE_URL}data-final-lite/${fileName}`)
+}
+
+async function getMonthDataFile(fileName) {
+    return await fetchData(`${BASE_URL}data-final-lite-month/${fileName}`)
 }
