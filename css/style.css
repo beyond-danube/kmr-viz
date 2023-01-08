@@ -2,6 +2,10 @@
     height: 30vh;
 }
 
+.bar-chart {
+    height: 50vh;
+}
+
 .table-fixed-head thead th { 
     position: sticky; 
     top: 0; z-index: 1; 
@@ -10,6 +14,7 @@
 
 @media only screen and (max-width: 600px) {
     .pie-chart {height: 10vh;}
+    .bar-chart {height: 20vh;}
 }
   
 @media only screen and (min-width: 600px) {

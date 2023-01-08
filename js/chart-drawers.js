@@ -232,7 +232,7 @@ function drawVotePieChart(data, id) {
 
         drawdata.addRows(dataElements)
 
-        var piechart = new google.visualization.PieChart(document.getElementById(id));
+        let piechart = new google.visualization.PieChart(document.getElementById(id));
         piechart.draw(drawdata, DONUT_CHART_OPTIONS);
     }
 
@@ -258,7 +258,7 @@ function drawResultPieChart(data, id) {
 
         drawdata.addRows(dataElements)
 
-        var piechart = new google.visualization.PieChart(document.getElementById(id));
+        let piechart = new google.visualization.PieChart(document.getElementById(id));
         piechart.draw(drawdata, DONUT_CHART_OPTIONS);
     }
 
@@ -290,8 +290,79 @@ function drawThemeDecision(data, id, decision) {
 
         drawdata.addRows(dataElements)
 
-        var piechart = new google.visualization.PieChart(document.getElementById(id));
+        let piechart = new google.visualization.PieChart(document.getElementById(id));
         piechart.draw(drawdata, DONUT_CHART_OPTIONS);
+    }
+
+}
+
+function drawVotesTrend(data, id) {
+
+    google.charts.load('current', {'packages':['corechart', 'bar']});
+    google.charts.setOnLoadCallback(drawVotesTendCallback);
+
+    function drawVotesTendCallback() {
+
+        let drawdata = new google.visualization.DataTable();
+        
+        drawdata.addColumn('string', 'місяць')
+
+        for (const voteOption in voteOptions) {
+            drawdata.addColumn('number', voteOptions[voteOption])      
+        }
+
+        let dataElements = [ ]
+
+        let dataByYearAndMonth = {}
+
+        data.forEach(entry => {
+
+            let yearAndMonth = `20${entry.docId.substring(0, 2)}-${entry.docId.substring(2, 4)}`
+
+            if(!dataByYearAndMonth.hasOwnProperty(yearAndMonth)) {
+                dataByYearAndMonth[yearAndMonth] = {}
+                for (const voteOption in voteOptions) {
+                    dataByYearAndMonth[yearAndMonth][voteOptions[voteOption]] = 0
+                }
+            }
+
+            for (const key in voteToCountMap) {
+                dataByYearAndMonth[yearAndMonth][voteOptions[key]] += entry[voteToCountMap[key]]
+            }
+            
+        })
+
+        for (const yearMonth in dataByYearAndMonth) {
+            let dataKey = [ yearMonth ]
+            let dataValues = []
+
+            for (const voteValue in dataByYearAndMonth[yearMonth]) {
+                dataValues.push(dataByYearAndMonth[yearMonth][voteValue])
+            }
+
+            let dataElement = dataKey.concat(dataValues)
+            dataElements.push(dataElement)
+        }
+
+        // sort by year and month
+        let sortedDataElements = dataElements.sort(function(x, y) {
+            let v1 = parseInt(x[0].split('-')[0]) + (parseInt(x[0].split('-')[1]) / 100)
+            let v2 = parseInt(y[0].split('-')[0]) + (parseInt(y[0].split('-')[1]) / 100)
+            let value = v1 - v2
+
+            return value
+        })
+
+        drawdata.addRows(sortedDataElements)
+
+        let options = {
+            legend: { position: 'right' },
+            bar: { groupWidth: '50%' },
+            isStacked: true,
+        };
+
+        let columntChart = new google.visualization.ColumnChart(document.getElementById(id));
+        columntChart.draw(drawdata, options);
     }
 
 }
