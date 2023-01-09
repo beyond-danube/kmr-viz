@@ -367,6 +367,83 @@ function drawVotesTrend(data, id, percent) {
 
 }
 
+function drawCategotyDecision(categotyData, id, percent) {
+    google.charts.load('current', {'packages':['corechart', 'bar']})
+    google.charts.setOnLoadCallback(drawCategotyDecisionCallback)
+
+    function drawCategotyDecisionCallback() {
+
+        let drawdata = new google.visualization.DataTable()
+        
+        drawdata.addColumn('string', 'місяць')
+
+        for (const themeName in readableThemeMap) {
+            drawdata.addColumn('number', readableThemeMap[themeName])
+        }
+
+        let dataElements = []
+
+        let dataByYearAndMonth = {}
+
+        for (const category in categotyData) {
+            for (const entry in categotyData[category]) {
+
+                let yearAndMonth = `20${categotyData[category][entry].docId.substring(0, 2)}-${categotyData[category][entry].docId.substring(2, 4)}`
+
+                if(!dataByYearAndMonth.hasOwnProperty(yearAndMonth)) {
+                    dataByYearAndMonth[yearAndMonth] = {}
+                    for (const themeName in readableThemeMap) {
+                        dataByYearAndMonth[yearAndMonth][readableThemeMap[themeName]] = 0
+                    }
+                }
+                
+                for (const theme in themeToCategoryMap) {
+                    for (const categortyName in themeToCategoryMap[theme]) {
+                        if(themeToCategoryMap[theme][categortyName] === category) dataByYearAndMonth[yearAndMonth][readableThemeMap[[theme]]]++
+                    }
+                }
+            }
+        }
+
+        console.log(dataByYearAndMonth)
+
+        for (const yearMonth in dataByYearAndMonth) {
+            let dataKey = [ yearMonth ]
+            let dataValues = []
+
+            for (const voteValue in dataByYearAndMonth[yearMonth]) {
+                dataValues.push(dataByYearAndMonth[yearMonth][voteValue])
+            }
+
+            let dataElement = dataKey.concat(dataValues)
+            dataElements.push(dataElement)
+        }
+
+        drawdata.addRows(sortDataByYearAndMonth(dataElements))
+
+        console.log(drawdata)
+
+        let options = {
+            legend: { position: 'right', maxLines: 4 },
+            bar: { groupWidth: '50%' },
+            isStacked: true,
+        }
+
+        if(percent == true) {
+            options.isStacked = 'percent'
+            options.vAxis = {}
+            options.vAxis = {
+                minValue: 0,
+                ticks: [0, .3, .6, .9, 1]
+            }
+        } 
+
+        let columntChart = new google.visualization.ColumnChart(document.getElementById(id))
+        columntChart.draw(drawdata, options)
+    }
+    
+}
+
 function drawDecisionTrend(data, id) {
     google.charts.load('current', {packages: ['corechart', 'line']})
     google.charts.setOnLoadCallback(drawDecisionTrendCallback)
@@ -409,8 +486,6 @@ function drawDecisionTrend(data, id) {
             }
             
         })
-
-        console.log(dataByYearAndMonth)
 
         for (const yearMonth in dataByYearAndMonth) {
             let dataKey = [ yearMonth ]

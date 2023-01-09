@@ -189,7 +189,7 @@
         </div>
         <div class="row">
             <div class="col-12">
-                <h5>Тренди в голосуваннях</h5>
+                <h5>Загальні тренди у голосуваннях</h5>
             </div>
         </div>
         <!-- <div class="row">
@@ -210,6 +210,8 @@
             <div class="col-12">
                 <div id="votes-trend" class="bar-chart"></div>
                 <div id="votes-trend-percent" class="bar-chart"></div>
+                <div id="theme-trend" class="bar-chart"></div>
+                <div id="theme-trend-percent" class="bar-chart"></div>
                 <div id="decision-trend" class="bar-chart"></div>
             </div>
         </div>
@@ -402,7 +404,10 @@
 
             drawVotesTrend(dataRowsFiltered, "votes-trend")
             drawVotesTrend(dataRowsFiltered, "votes-trend-percent", true)
+            drawCategotyDecision(votesByCategory, "theme-trend")
+            drawCategotyDecision(votesByCategory, "theme-trend-percent", true)
             drawDecisionTrend(dataRowsFiltered, "decision-trend")
+            
 
             let tables = document.getElementById("details-tables")
             tables.innerHTML = ''
