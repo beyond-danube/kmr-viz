@@ -214,6 +214,16 @@ function getDrawingData(categotyVotingData) {
         votesByCategory[categoty].forEach(entry => flatViewData.push(entry))
     }
 
+    function sortDataByYearAndMonth(data) {
+        return data.sort(function(x, y) {
+            let v1 = parseInt(x[0].split('-')[0]) + (parseInt(x[0].split('-')[1]) / 100)
+            let v2 = parseInt(y[0].split('-')[0]) + (parseInt(y[0].split('-')[1]) / 100)
+            let value = v1 - v2
+    
+            return value
+        })
+    }
+
     return {
         voteChartData: () => { 
             let dataElements = []
@@ -253,7 +263,156 @@ function getDrawingData(categotyVotingData) {
                 }
             }
             return { columns: [['string', 'Тема'], ['number', 'Число']], rowsYes: dataElements[resultOptions.YES], rowsNo: dataElements[resultOptions.NO] }
+        },
+        votesByMonthChartData: () => {
+            let votesByMonthColumns = []
 
+            votesByMonthColumns.push(['string', 'місяць'])
+
+            for (const voteOption in voteOptions) {
+                votesByMonthColumns.push(['number', voteOptions[voteOption]])      
+            }
+
+            let dataElements = []
+
+            let dataByYearAndMonth = {}
+
+            flatViewData.forEach(entry => {
+
+                let yearAndMonth = `20${entry.docId.substring(0, 2)}-${entry.docId.substring(2, 4)}`
+
+                if(!dataByYearAndMonth.hasOwnProperty(yearAndMonth)) {
+                    dataByYearAndMonth[yearAndMonth] = {}
+                    for (const voteOption in voteOptions) {
+                        dataByYearAndMonth[yearAndMonth][voteOptions[voteOption]] = 0
+                    }
+                }
+
+                for (const key in voteToCountMap) {
+                    dataByYearAndMonth[yearAndMonth][voteOptions[key]] += entry[voteToCountMap[key]]
+                }
+                
+            })
+
+            for (const yearMonth in dataByYearAndMonth) {
+                let dataKey = [ yearMonth ]
+                let dataValues = []
+
+                for (const voteValue in dataByYearAndMonth[yearMonth]) {
+                    dataValues.push(dataByYearAndMonth[yearMonth][voteValue])
+                }
+
+                let dataElement = dataKey.concat(dataValues)
+                dataElements.push(dataElement)
+            }
+
+            let sortedDataElements = sortDataByYearAndMonth(dataElements)
+
+            return { columns: votesByMonthColumns, rows: sortedDataElements }
+        },
+        resultsByMonthByCategoryData: () => {
+            let resultsByMonthByCategoryColumns = []
+
+            resultsByMonthByCategoryColumns.push(['string', 'місяць'])
+
+            for (const themeName in readableThemeMap) {
+                resultsByMonthByCategoryColumns.push(['number', readableThemeMap[themeName]])
+            }
+
+            let dataElements = []
+
+            let dataByYearAndMonth = {}
+
+            for (const category in categotyVotingData) {
+                for (const entry in categotyVotingData[category]) {
+
+                    let yearAndMonth = `20${categotyVotingData[category][entry].docId.substring(0, 2)}-${categotyVotingData[category][entry].docId.substring(2, 4)}`
+
+                    if(!dataByYearAndMonth.hasOwnProperty(yearAndMonth)) {
+                        dataByYearAndMonth[yearAndMonth] = {}
+                        for (const themeName in readableThemeMap) {
+                            dataByYearAndMonth[yearAndMonth][readableThemeMap[themeName]] = 0
+                        }
+                    }
+                    
+                    for (const theme in themeToCategoryMap) {
+                        for (const categortyName in themeToCategoryMap[theme]) {
+                            if(themeToCategoryMap[theme][categortyName] === category) dataByYearAndMonth[yearAndMonth][readableThemeMap[[theme]]]++
+                        }
+                    }
+                }
+            }
+
+            for (const yearMonth in dataByYearAndMonth) {
+                let dataKey = [ yearMonth ]
+                let dataValues = []
+
+                for (const voteValue in dataByYearAndMonth[yearMonth]) {
+                    dataValues.push(dataByYearAndMonth[yearMonth][voteValue])
+                }
+
+                let dataElement = dataKey.concat(dataValues)
+                dataElements.push(dataElement)
+            }
+
+            let sortedDataElements = sortDataByYearAndMonth(dataElements)
+
+            return { columns: resultsByMonthByCategoryColumns, rows: sortedDataElements }
+        },
+        resultByMonthChartData: () => {
+
+            let resultColumnsByMonth = []
+            resultColumnsByMonth.push(['string', 'місяць'])
+
+            for (const resultOption in resultOptions) {
+                resultColumnsByMonth.push(['number', resultOptions[resultOption]])      
+            }
+
+            let dataElements = []
+
+            let dataByYearAndMonth = {}
+
+            flatViewData.forEach(entry => {
+
+                let yearAndMonth = `20${entry.docId.substring(0, 2)}-${entry.docId.substring(2, 4)}`
+    
+                if(!dataByYearAndMonth.hasOwnProperty(yearAndMonth)) {
+                    dataByYearAndMonth[yearAndMonth] = {}
+                    for (const resultOption in resultOptions) {
+                        dataByYearAndMonth[yearAndMonth][resultOptions[resultOption]] = 0
+                    }
+                }
+    
+                switch (entry.RESULT) {
+                    case resultOptions.YES:
+                        dataByYearAndMonth[yearAndMonth][resultOptions.YES]++
+                        break
+    
+                    case resultOptions.NO:
+                        dataByYearAndMonth[yearAndMonth][resultOptions.NO]++
+                        break
+            
+                    default:
+                        break
+                }
+                
+            })
+    
+            for (const yearMonth in dataByYearAndMonth) {
+                let dataKey = [ yearMonth ]
+                let dataValues = []
+    
+                for (const resultValue in dataByYearAndMonth[yearMonth]) {
+                    dataValues.push(dataByYearAndMonth[yearMonth][resultValue])
+                }
+    
+                let dataElement = dataKey.concat(dataValues)
+                dataElements.push(dataElement)
+            }
+
+            let sortedDataElements = sortDataByYearAndMonth(dataElements)
+
+            return { columns: resultColumnsByMonth, rows: sortedDataElements }
         }
 
     }
@@ -278,58 +437,21 @@ function drawPieChart(columns, rows, id) {
     }
 }
 
-function drawVotesTrend(data, id, percent) {
-
+function drawColumnChart(columns, rows, id, legendPosition, percent) {
     google.charts.load('current', {'packages':['corechart', 'bar']})
-    google.charts.setOnLoadCallback(drawVotesTrendCallback)
+    google.charts.setOnLoadCallback(drawColumnChartCallback)
 
-    function drawVotesTrendCallback() {
-
+    function drawColumnChartCallback() { 
         let drawdata = new google.visualization.DataTable()
-        
-        drawdata.addColumn('string', 'місяць')
 
-        for (const voteOption in voteOptions) {
-            drawdata.addColumn('number', voteOptions[voteOption])      
+        for (const column of columns) {
+            drawdata.addColumn(column[0], column[1])
         }
 
-        let dataElements = []
-
-        let dataByYearAndMonth = {}
-
-        data.forEach(entry => {
-
-            let yearAndMonth = `20${entry.docId.substring(0, 2)}-${entry.docId.substring(2, 4)}`
-
-            if(!dataByYearAndMonth.hasOwnProperty(yearAndMonth)) {
-                dataByYearAndMonth[yearAndMonth] = {}
-                for (const voteOption in voteOptions) {
-                    dataByYearAndMonth[yearAndMonth][voteOptions[voteOption]] = 0
-                }
-            }
-
-            for (const key in voteToCountMap) {
-                dataByYearAndMonth[yearAndMonth][voteOptions[key]] += entry[voteToCountMap[key]]
-            }
-            
-        })
-
-        for (const yearMonth in dataByYearAndMonth) {
-            let dataKey = [ yearMonth ]
-            let dataValues = []
-
-            for (const voteValue in dataByYearAndMonth[yearMonth]) {
-                dataValues.push(dataByYearAndMonth[yearMonth][voteValue])
-            }
-
-            let dataElement = dataKey.concat(dataValues)
-            dataElements.push(dataElement)
-        }
-
-        drawdata.addRows(sortDataByYearAndMonth(dataElements))
+        drawdata.addRows(rows)
 
         let options = {
-            legend: { position: 'bottom' },
+            legend: { position: legendPosition },
             bar: { groupWidth: '50%' },
             isStacked: true,
         }
@@ -346,160 +468,29 @@ function drawVotesTrend(data, id, percent) {
         let columntChart = new google.visualization.ColumnChart(document.getElementById(id))
         columntChart.draw(drawdata, options)
     }
-
 }
 
-function drawCategotyDecision(categotyData, id, percent) {
-    google.charts.load('current', {'packages':['corechart', 'bar']})
-    google.charts.setOnLoadCallback(drawCategotyDecisionCallback)
-
-    function drawCategotyDecisionCallback() {
-
-        let drawdata = new google.visualization.DataTable()
-        
-        drawdata.addColumn('string', 'місяць')
-
-        for (const themeName in readableThemeMap) {
-            drawdata.addColumn('number', readableThemeMap[themeName])
-        }
-
-        let dataElements = []
-
-        let dataByYearAndMonth = {}
-
-        for (const category in categotyData) {
-            for (const entry in categotyData[category]) {
-
-                let yearAndMonth = `20${categotyData[category][entry].docId.substring(0, 2)}-${categotyData[category][entry].docId.substring(2, 4)}`
-
-                if(!dataByYearAndMonth.hasOwnProperty(yearAndMonth)) {
-                    dataByYearAndMonth[yearAndMonth] = {}
-                    for (const themeName in readableThemeMap) {
-                        dataByYearAndMonth[yearAndMonth][readableThemeMap[themeName]] = 0
-                    }
-                }
-                
-                for (const theme in themeToCategoryMap) {
-                    for (const categortyName in themeToCategoryMap[theme]) {
-                        if(themeToCategoryMap[theme][categortyName] === category) dataByYearAndMonth[yearAndMonth][readableThemeMap[[theme]]]++
-                    }
-                }
-            }
-        }
-
-        console.log(dataByYearAndMonth)
-
-        for (const yearMonth in dataByYearAndMonth) {
-            let dataKey = [ yearMonth ]
-            let dataValues = []
-
-            for (const voteValue in dataByYearAndMonth[yearMonth]) {
-                dataValues.push(dataByYearAndMonth[yearMonth][voteValue])
-            }
-
-            let dataElement = dataKey.concat(dataValues)
-            dataElements.push(dataElement)
-        }
-
-        drawdata.addRows(sortDataByYearAndMonth(dataElements))
-
-        console.log(drawdata)
-
-        let options = {
-            legend: { position: 'right' },
-            bar: { groupWidth: '50%' },
-            isStacked: true,
-        }
-
-        if(percent == true) {
-            options.isStacked = 'percent'
-            options.vAxis = {}
-            options.vAxis = {
-                minValue: 0,
-                ticks: [0, .3, .6, .9, 1]
-            }
-        } 
-
-        let columntChart = new google.visualization.ColumnChart(document.getElementById(id))
-        columntChart.draw(drawdata, options)
-    }
-    
-}
-
-function drawDecisionTrend(data, id) {
+function drawLineChart(columns, rows, id) {
     google.charts.load('current', {packages: ['corechart', 'line']})
-    google.charts.setOnLoadCallback(drawDecisionTrendCallback)
+    google.charts.setOnLoadCallback(drawLineChartCallback)
 
-    function drawDecisionTrendCallback() { 
+    function drawLineChartCallback() {
         let drawdata = new google.visualization.DataTable()
-        
-        drawdata.addColumn('string', 'місяць')
 
-        for (const resultOption in resultOptions) {
-            drawdata.addColumn('number', resultOptions[resultOption])      
+        for (const column of columns) {
+            drawdata.addColumn(column[0], column[1])
         }
 
-        let dataElements = []
-
-        let dataByYearAndMonth = {}
-
-        data.forEach(entry => {
-
-            let yearAndMonth = `20${entry.docId.substring(0, 2)}-${entry.docId.substring(2, 4)}`
-
-            if(!dataByYearAndMonth.hasOwnProperty(yearAndMonth)) {
-                dataByYearAndMonth[yearAndMonth] = {}
-                for (const resultOption in resultOptions) {
-                    dataByYearAndMonth[yearAndMonth][resultOptions[resultOption]] = 0
-                }
-            }
-
-            switch (entry.RESULT) {
-                case resultOptions.YES:
-                    dataByYearAndMonth[yearAndMonth][resultOptions.YES]++
-                    break
-
-                case resultOptions.NO:
-                    dataByYearAndMonth[yearAndMonth][resultOptions.NO]++
-                    break
-        
-                default:
-                    break
-            }
-            
-        })
-
-        for (const yearMonth in dataByYearAndMonth) {
-            let dataKey = [ yearMonth ]
-            let dataValues = []
-
-            for (const resultValue in dataByYearAndMonth[yearMonth]) {
-                dataValues.push(dataByYearAndMonth[yearMonth][resultValue])
-            }
-
-            let dataElement = dataKey.concat(dataValues)
-            dataElements.push(dataElement)
-        }
-
-        drawdata.addRows(sortDataByYearAndMonth(dataElements))
+        drawdata.addRows(rows)
 
         let options = {
             curveType: 'function',
             legend: { position: 'bottom' },
             vAxis:{ viewWindow: {min: 0} }
-          }
+        }
 
         let lineChart = new google.visualization.LineChart(document.getElementById(id))
         lineChart.draw(drawdata, options)
+        
     }
-}
-
-function sortDataByYearAndMonth(data) {
-    return data.sort(function(x, y) {
-        let v1 = parseInt(x[0].split('-')[0]) + (parseInt(x[0].split('-')[1]) / 100)
-        let v2 = parseInt(y[0].split('-')[0]) + (parseInt(y[0].split('-')[1]) / 100)
-        let value = v1 - v2
-
-        return value
-    })
 }
