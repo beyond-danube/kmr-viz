@@ -14,7 +14,6 @@
 
 @media only screen and (max-width: 600px) {
     .pie-chart {height: 10vh;}
-    .bar-chart {height: 20vh;}
 }
   
 @media only screen and (min-width: 600px) {
@@ -23,10 +22,13 @@
 
 @media only screen and (min-width: 768px) {
     .pie-chart {height: 20vh;}
+    .bar-chart {height: 30vh;}
+
 } 
 
 @media only screen and (min-width: 992px) {
     .pie-chart {height: 30vh;}
+    .bar-chart {height: 50vh;}
 } 
 
 @media only screen and (min-width: 1200px) {

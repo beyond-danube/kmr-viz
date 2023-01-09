@@ -189,10 +189,24 @@
         </div>
         <div class="row">
             <div class="col-12">
-                <h5>Сумарна кількість голосів</h5>
+                <h5>Тренди в голосуваннях</h5>
                 <div id="votes-trend" class="bar-chart"></div>
+                <div id="votes-trend-percent" class="bar-chart"></div>
+                <div id="decision-trend" class="bar-chart"></div>
             </div>
         </div>
+        <!-- <div class="row">
+            <div class="col-12">
+                <h5>Голоси у відсотках</h5>
+                <div id="votes-trend-percent" class="bar-chart"></div>
+            </div>
+        </div> -->
+        <!-- <div class="row">
+            <div class="col-12">
+                <h5>Кількість розглянутих питань</h5>
+                <div id="decision-trend" class="bar-chart"></div>
+            </div>
+        </div> -->
     </div>
     <div class="container">
         <h1>Всі рішення списком</h1>
@@ -369,21 +383,36 @@
                 })
             }
 
+            let dataRowsFiltered = categotyToFlatArray()
+
             drawChart(votesByCategory)
 
             console.log(votesByCategory)
 
-            drawVotePieChart(datarows, "votes-distributon")
-            drawResultPieChart(datarows, "results-distributon")
+            drawVotePieChart(dataRowsFiltered, "votes-distributon")
+            drawResultPieChart(dataRowsFiltered, "results-distributon")
             drawThemeDecision(votesByCategory, "results-category-yes", resultOptions.YES)
             drawThemeDecision(votesByCategory, "results-category-no", resultOptions.NO)
 
-            drawVotesTrend(datarows, "votes-trend")
+            drawVotesTrend(dataRowsFiltered, "votes-trend")
+            drawVotesTrend(dataRowsFiltered, "votes-trend-percent", true)
+            drawDecisionTrend(dataRowsFiltered, "decision-trend")
 
             let tables = document.getElementById("details-tables")
             tables.innerHTML = ''
 
             createThemeTables(votesByCategory)
+        }
+
+        function categotyToFlatArray() {
+
+            let backToFlatView = []
+
+            for (const categoty in votesByCategory) {
+                votesByCategory[categoty].forEach(entry => backToFlatView.push(entry))
+            }
+
+            return backToFlatView
         }
         
 
