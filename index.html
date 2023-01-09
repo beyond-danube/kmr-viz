@@ -414,10 +414,13 @@
 
             console.log(votesByCategory)
 
-            drawVotePieChart(dataRowsFiltered, "votes-distributon")
-            drawResultPieChart(dataRowsFiltered, "results-distributon")
-            drawThemeDecision(votesByCategory, "results-category-yes", resultOptions.YES)
-            drawThemeDecision(votesByCategory, "results-category-no", resultOptions.NO)
+            let drawingData = getDrawingData(votesByCategory)
+
+            // draw pie charts
+            drawPieChart(drawingData.voteChartData().columns, drawingData.voteChartData().rows, "votes-distributon")
+            drawPieChart(drawingData.resultChartData().columns, drawingData.resultChartData().rows, "results-distributon")
+            drawPieChart(drawingData.resultsByCategoryData().columns, drawingData.resultsByCategoryData().rowsYes, "results-category-yes")
+            drawPieChart(drawingData.resultsByCategoryData().columns, drawingData.resultsByCategoryData().rowsNo, "results-category-no")
 
             drawVotesTrend(dataRowsFiltered, "votes-trend")
             drawVotesTrend(dataRowsFiltered, "votes-trend-percent", true)

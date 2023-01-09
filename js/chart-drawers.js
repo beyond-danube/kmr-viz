@@ -207,93 +207,75 @@ function guessCategory(topic) {
     else return 'Інша категорія'
 }
 
-function drawVotePieChart(data, id) {
+function getDrawingData(categotyVotingData) {
+    let flatViewData = []
 
-    google.charts.load('current', {'packages':['corechart']})
-    google.charts.setOnLoadCallback(drawPieChartCallback)
-
-    function drawPieChartCallback() {
-
-        let dataElements = []
-
-        for (const voteKey in voteOptions) {
-
-            let total = 0
-
-            data.forEach(entry => total = total + entry[voteToCountMap[voteKey]])
-
-            dataElements.push([ voteOptions[voteKey], total ])
-        }
-
-
-        let drawdata = new google.visualization.DataTable()
-        drawdata.addColumn('string', 'Голос')
-        drawdata.addColumn('number', 'Число') 
-
-        drawdata.addRows(dataElements)
-
-        let piechart = new google.visualization.PieChart(document.getElementById(id))
-        piechart.draw(drawdata, DONUT_CHART_OPTIONS)
+    for (const categoty in categotyVotingData) {
+        votesByCategory[categoty].forEach(entry => flatViewData.push(entry))
     }
 
+    return {
+        voteChartData: () => { 
+            let dataElements = []
+
+            for (const voteKey in voteOptions) {
+                let total = 0
+
+                flatViewData.forEach(entry => total = total + entry[voteToCountMap[voteKey]])
+                dataElements.push([ voteOptions[voteKey], total ])
+            }
+
+            return { columns: [['string', 'Голос'], ['number', 'Число']], rows: dataElements }
+        },
+        resultChartData: () => {
+            let dataElements = []
+
+            for (const resultKey in resultOptions) {
+                dataElements.push([ resultOptions[resultKey], flatViewData.filter(res => res.RESULT === resultOptions[resultKey]).length ])
+            }
+
+            return { columns: [['string', 'Результат'], ['number', 'Число']], rows: dataElements }
+        },
+        resultsByCategoryData: () => {
+            let dataElements = {}
+
+            for (const resultKey in resultOptions) {
+                dataElements[resultOptions[resultKey]] = []
+            }
+
+            for (const resultKey in resultOptions) { 
+
+                for (const theme in themeToCategoryMap) {
+                    let total = 0
+                    themeToCategoryMap[theme].forEach(themeItem => categotyVotingData.hasOwnProperty(themeItem) ? total = total + categotyVotingData[themeItem].filter(item => item.RESULT === resultOptions[resultKey]).length : total = total)
+
+                    dataElements[resultOptions[resultKey]].push( [ readableThemeMap[theme], total ] )
+                }
+            }
+            return { columns: [['string', 'Тема'], ['number', 'Число']], rowsYes: dataElements[resultOptions.YES], rowsNo: dataElements[resultOptions.NO] }
+
+        }
+
+    }
+           
 }
 
-function drawResultPieChart(data, id) {
-
+function drawPieChart(columns, rows, id) {
     google.charts.load('current', {'packages':['corechart']})
-    google.charts.setOnLoadCallback(drawPieChartCallback)
+    google.charts.setOnLoadCallback(pieChartCallback)
 
-    function drawPieChartCallback() {
+    function pieChartCallback() {
+        let drawdata = new google.visualization.DataTable()
 
-        let dataElements = []
-
-        for (const resultKey in resultOptions) {
-            dataElements.push([ resultOptions[resultKey], data.filter(res => res.RESULT === resultOptions[resultKey]).length ])
+        for (const column of columns) {
+            drawdata.addColumn(column[0], column[1])
         }
 
-
-        let drawdata = new google.visualization.DataTable()
-        drawdata.addColumn('string', 'Голос')
-        drawdata.addColumn('number', 'Число') 
-
-        drawdata.addRows(dataElements)
+        drawdata.addRows(rows)
 
         let piechart = new google.visualization.PieChart(document.getElementById(id))
         piechart.draw(drawdata, DONUT_CHART_OPTIONS)
     }
-
-}
-
-
-function drawThemeDecision(data, id, decision) {
-
-    google.charts.load('current', {'packages':['corechart']})
-    google.charts.setOnLoadCallback(drawDecisionCallback)
-
-    function drawDecisionCallback() {
-
-        let dataElements = []
-
-        for (const theme in themeToCategoryMap) {
-
-            let total = 0
-
-            themeToCategoryMap[theme].forEach(themeItem => data.hasOwnProperty(themeItem) ? total = total + data[themeItem].filter(item => item.RESULT === decision).length : total = total)
-
-            dataElements.push( [ readableThemeMap[theme], total ] )
-
-        }
-
-        let drawdata = new google.visualization.DataTable()
-        drawdata.addColumn('string', 'Тема')
-        drawdata.addColumn('number', 'Число') 
-
-        drawdata.addRows(dataElements)
-
-        let piechart = new google.visualization.PieChart(document.getElementById(id))
-        piechart.draw(drawdata, DONUT_CHART_OPTIONS)
-    }
-
 }
 
 function drawVotesTrend(data, id, percent) {
