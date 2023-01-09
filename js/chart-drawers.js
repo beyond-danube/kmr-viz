@@ -424,7 +424,7 @@ function drawCategotyDecision(categotyData, id, percent) {
         console.log(drawdata)
 
         let options = {
-            legend: { position: 'right', maxLines: 4 },
+            legend: { position: 'right' },
             bar: { groupWidth: '50%' },
             isStacked: true,
         }
