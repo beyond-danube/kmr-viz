@@ -347,7 +347,7 @@ function drawVotesTrend(data, id, percent) {
         drawdata.addRows(sortDataByYearAndMonth(dataElements))
 
         let options = {
-            legend: { position: 'right' },
+            legend: { position: 'bottom' },
             bar: { groupWidth: '50%' },
             isStacked: true,
         }
@@ -428,6 +428,7 @@ function drawDecisionTrend(data, id) {
 
         let options = {
             curveType: 'function',
+            legend: { position: 'bottom' },
             vAxis:{ viewWindow: {min: 0} }
           }
 
