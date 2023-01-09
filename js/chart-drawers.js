@@ -9,10 +9,10 @@ function drawChart(categoryVoting) {
 
     function drawSankeyChart() {
 
-        let data = new google.visualization.DataTable();
-        data.addColumn('string', 'From');
-        data.addColumn('string', 'To');
-        data.addColumn('number', 'Weight');
+        let data = new google.visualization.DataTable()
+        data.addColumn('string', 'From')
+        data.addColumn('string', 'To')
+        data.addColumn('number', 'Weight')
     
         let drawdata = []
 
@@ -28,7 +28,7 @@ function drawChart(categoryVoting) {
         for (const categoryKey in categoryVoting) {
             for (const voteKey in voteOptions) {
 
-                let count = 0;
+                let count = 0
                 categoryVoting[categoryKey].forEach(item => { 
                     count = count + item[voteToCountMap[voteKey]]
                 })
@@ -60,10 +60,10 @@ function drawChart(categoryVoting) {
         }
     
     
-        data.addRows(drawdata);
+        data.addRows(drawdata)
     
-        let chart = new google.visualization.Sankey(document.getElementById(MAIN_VOTING_CHART_DIV));
-        chart.draw(data);
+        let chart = new google.visualization.Sankey(document.getElementById(MAIN_VOTING_CHART_DIV))
+        chart.draw(data)
     }
 }
 
@@ -209,8 +209,8 @@ function guessCategory(topic) {
 
 function drawVotePieChart(data, id) {
 
-    google.charts.load('current', {'packages':['corechart']});
-    google.charts.setOnLoadCallback(drawPieChartCallback);
+    google.charts.load('current', {'packages':['corechart']})
+    google.charts.setOnLoadCallback(drawPieChartCallback)
 
     function drawPieChartCallback() {
 
@@ -226,22 +226,22 @@ function drawVotePieChart(data, id) {
         }
 
 
-        let drawdata = new google.visualization.DataTable();
+        let drawdata = new google.visualization.DataTable()
         drawdata.addColumn('string', 'Голос')
         drawdata.addColumn('number', 'Число') 
 
         drawdata.addRows(dataElements)
 
-        var piechart = new google.visualization.PieChart(document.getElementById(id));
-        piechart.draw(drawdata, DONUT_CHART_OPTIONS);
+        let piechart = new google.visualization.PieChart(document.getElementById(id))
+        piechart.draw(drawdata, DONUT_CHART_OPTIONS)
     }
 
 }
 
 function drawResultPieChart(data, id) {
 
-    google.charts.load('current', {'packages':['corechart']});
-    google.charts.setOnLoadCallback(drawPieChartCallback);
+    google.charts.load('current', {'packages':['corechart']})
+    google.charts.setOnLoadCallback(drawPieChartCallback)
 
     function drawPieChartCallback() {
 
@@ -252,14 +252,14 @@ function drawResultPieChart(data, id) {
         }
 
 
-        let drawdata = new google.visualization.DataTable();
+        let drawdata = new google.visualization.DataTable()
         drawdata.addColumn('string', 'Голос')
         drawdata.addColumn('number', 'Число') 
 
         drawdata.addRows(dataElements)
 
-        var piechart = new google.visualization.PieChart(document.getElementById(id));
-        piechart.draw(drawdata, DONUT_CHART_OPTIONS);
+        let piechart = new google.visualization.PieChart(document.getElementById(id))
+        piechart.draw(drawdata, DONUT_CHART_OPTIONS)
     }
 
 }
@@ -267,8 +267,8 @@ function drawResultPieChart(data, id) {
 
 function drawThemeDecision(data, id, decision) {
 
-    google.charts.load('current', {'packages':['corechart']});
-    google.charts.setOnLoadCallback(drawDecisionCallback);
+    google.charts.load('current', {'packages':['corechart']})
+    google.charts.setOnLoadCallback(drawDecisionCallback)
 
     function drawDecisionCallback() {
 
@@ -284,14 +284,165 @@ function drawThemeDecision(data, id, decision) {
 
         }
 
-        let drawdata = new google.visualization.DataTable();
+        let drawdata = new google.visualization.DataTable()
         drawdata.addColumn('string', 'Тема')
         drawdata.addColumn('number', 'Число') 
 
         drawdata.addRows(dataElements)
 
-        var piechart = new google.visualization.PieChart(document.getElementById(id));
-        piechart.draw(drawdata, DONUT_CHART_OPTIONS);
+        let piechart = new google.visualization.PieChart(document.getElementById(id))
+        piechart.draw(drawdata, DONUT_CHART_OPTIONS)
     }
 
+}
+
+function drawVotesTrend(data, id, percent) {
+
+    google.charts.load('current', {'packages':['corechart', 'bar']})
+    google.charts.setOnLoadCallback(drawVotesTrendCallback)
+
+    function drawVotesTrendCallback() {
+
+        let drawdata = new google.visualization.DataTable()
+        
+        drawdata.addColumn('string', 'місяць')
+
+        for (const voteOption in voteOptions) {
+            drawdata.addColumn('number', voteOptions[voteOption])      
+        }
+
+        let dataElements = []
+
+        let dataByYearAndMonth = {}
+
+        data.forEach(entry => {
+
+            let yearAndMonth = `20${entry.docId.substring(0, 2)}-${entry.docId.substring(2, 4)}`
+
+            if(!dataByYearAndMonth.hasOwnProperty(yearAndMonth)) {
+                dataByYearAndMonth[yearAndMonth] = {}
+                for (const voteOption in voteOptions) {
+                    dataByYearAndMonth[yearAndMonth][voteOptions[voteOption]] = 0
+                }
+            }
+
+            for (const key in voteToCountMap) {
+                dataByYearAndMonth[yearAndMonth][voteOptions[key]] += entry[voteToCountMap[key]]
+            }
+            
+        })
+
+        for (const yearMonth in dataByYearAndMonth) {
+            let dataKey = [ yearMonth ]
+            let dataValues = []
+
+            for (const voteValue in dataByYearAndMonth[yearMonth]) {
+                dataValues.push(dataByYearAndMonth[yearMonth][voteValue])
+            }
+
+            let dataElement = dataKey.concat(dataValues)
+            dataElements.push(dataElement)
+        }
+
+        drawdata.addRows(sortDataByYearAndMonth(dataElements))
+
+        let options = {
+            legend: { position: 'bottom' },
+            bar: { groupWidth: '50%' },
+            isStacked: true,
+        }
+
+        if(percent == true) {
+            options.isStacked = 'percent'
+            options.vAxis = {}
+            options.vAxis = {
+                minValue: 0,
+                ticks: [0, .3, .6, .9, 1]
+            }
+        } 
+
+        let columntChart = new google.visualization.ColumnChart(document.getElementById(id))
+        columntChart.draw(drawdata, options)
+    }
+
+}
+
+function drawDecisionTrend(data, id) {
+    google.charts.load('current', {packages: ['corechart', 'line']})
+    google.charts.setOnLoadCallback(drawDecisionTrendCallback)
+
+    function drawDecisionTrendCallback() { 
+        let drawdata = new google.visualization.DataTable()
+        
+        drawdata.addColumn('string', 'місяць')
+
+        for (const resultOption in resultOptions) {
+            drawdata.addColumn('number', resultOptions[resultOption])      
+        }
+
+        let dataElements = []
+
+        let dataByYearAndMonth = {}
+
+        data.forEach(entry => {
+
+            let yearAndMonth = `20${entry.docId.substring(0, 2)}-${entry.docId.substring(2, 4)}`
+
+            if(!dataByYearAndMonth.hasOwnProperty(yearAndMonth)) {
+                dataByYearAndMonth[yearAndMonth] = {}
+                for (const resultOption in resultOptions) {
+                    dataByYearAndMonth[yearAndMonth][resultOptions[resultOption]] = 0
+                }
+            }
+
+            switch (entry.RESULT) {
+                case resultOptions.YES:
+                    dataByYearAndMonth[yearAndMonth][resultOptions.YES]++
+                    break
+
+                case resultOptions.NO:
+                    dataByYearAndMonth[yearAndMonth][resultOptions.NO]++
+                    break
+        
+                default:
+                    break
+            }
+            
+        })
+
+        console.log(dataByYearAndMonth)
+
+        for (const yearMonth in dataByYearAndMonth) {
+            let dataKey = [ yearMonth ]
+            let dataValues = []
+
+            for (const resultValue in dataByYearAndMonth[yearMonth]) {
+                dataValues.push(dataByYearAndMonth[yearMonth][resultValue])
+            }
+
+            let dataElement = dataKey.concat(dataValues)
+            dataElements.push(dataElement)
+        }
+
+        drawdata.addRows(sortDataByYearAndMonth(dataElements))
+
+        let options = {
+            curveType: 'function',
+            legend: { position: 'bottom' },
+            vAxis:{ viewWindow: {min: 0} }
+          }
+
+        let lineChart = new google.visualization.LineChart(document.getElementById(id))
+        lineChart.draw(drawdata, options)
+    }
+}
+
+function sortDataByYearAndMonth(data) {
+    return data.sort(function(x, y) {
+        let v1 = parseInt(x[0].split('-')[0]) + (parseInt(x[0].split('-')[1]) / 100)
+        let v2 = parseInt(y[0].split('-')[0]) + (parseInt(y[0].split('-')[1]) / 100)
+        let value = v1 - v2
+
+        return value
+    })
 }

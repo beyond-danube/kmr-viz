@@ -97,8 +97,8 @@
             </div>
             <div class="col-2">
                 <select id="month-from" class="form-select">
-                  <option>01</option>
-                  <option selected>02</option>
+                  <option selected>01</option>
+                  <option>02</option>
                   <option>03</option>
                   <option>04</option>
                   <option>05</option>
@@ -132,7 +132,7 @@
                   <option>09</option>
                   <option>10</option>
                   <option>11</option>
-                  <option>12</option>
+                  <option selected>12</option>
                 </select>
             </div>
             <div class="col-2">
@@ -185,6 +185,32 @@
             <div class="col-lg-6">
                 <h5>Рішення за період</h5>
                 <div id="results-distributon" class="pie-chart"></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <h5>Тренди в голосуваннях</h5>
+            </div>
+        </div>
+        <!-- <div class="row">
+            <div class="col-12">
+                <h5>Голоси у відсотках</h5>
+                <div id="votes-trend-percent" class="bar-chart"></div>
+            </div>
+        </div> -->
+        <!-- <div class="row">
+            <div class="col-12">
+                <h5>Кількість розглянутих питань</h5>
+                <div id="decision-trend" class="bar-chart"></div>
+            </div>
+        </div> -->
+    </div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div id="votes-trend" class="bar-chart"></div>
+                <div id="votes-trend-percent" class="bar-chart"></div>
+                <div id="decision-trend" class="bar-chart"></div>
             </div>
         </div>
     </div>
@@ -341,23 +367,17 @@
 
         window.addEventListener('load', async () => { 
             dataFiles = await getDateMapByMonth()
-            await getDataForChartRange()
-
-            votesByCategory = getVotingResultsByCategory(datarows)
-            drawChart(votesByCategory)
-
-            console.log(votesByCategory)
-
-            drawVotePieChart(datarows, "votes-distributon")
-            drawResultPieChart(datarows, "results-distributon")
-            drawThemeDecision(votesByCategory, "results-category-yes", resultOptions.YES)
-            drawThemeDecision(votesByCategory, "results-category-no", resultOptions.NO)
-
-            createThemeTables(votesByCategory)
+            await drawAllCharts()
         })
 
         submitButton.addEventListener('click', async () => {
+            await drawAllCharts()
+        })
+
+        async function drawAllCharts() {
             await getDataForChartRange()
+
+            console.log(datarows)
 
             votesByCategory = getVotingResultsByCategory(datarows)
 
@@ -369,20 +389,37 @@
                 })
             }
 
+            let dataRowsFiltered = categotyToFlatArray()
+
             drawChart(votesByCategory)
 
             console.log(votesByCategory)
 
-            drawVotePieChart(datarows, "votes-distributon")
-            drawResultPieChart(datarows, "results-distributon")
+            drawVotePieChart(dataRowsFiltered, "votes-distributon")
+            drawResultPieChart(dataRowsFiltered, "results-distributon")
             drawThemeDecision(votesByCategory, "results-category-yes", resultOptions.YES)
             drawThemeDecision(votesByCategory, "results-category-no", resultOptions.NO)
+
+            drawVotesTrend(dataRowsFiltered, "votes-trend")
+            drawVotesTrend(dataRowsFiltered, "votes-trend-percent", true)
+            drawDecisionTrend(dataRowsFiltered, "decision-trend")
 
             let tables = document.getElementById("details-tables")
             tables.innerHTML = ''
 
             createThemeTables(votesByCategory)
-        })
+        }
+
+        function categotyToFlatArray() {
+
+            let backToFlatView = []
+
+            for (const categoty in votesByCategory) {
+                votesByCategory[categoty].forEach(entry => backToFlatView.push(entry))
+            }
+
+            return backToFlatView
+        }
         
 
     </script>
