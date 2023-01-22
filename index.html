@@ -198,11 +198,6 @@
                 <div id="results-distributon" class="pie-chart"></div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-12">
-                <h5>Загальні тренди у голосуваннях</h5>
-            </div>
-        </div>
         <!-- <div class="row">
             <div class="col-12">
                 <h5>Голоси у відсотках</h5>
@@ -217,6 +212,11 @@
         </div> -->
     </div>
     <div class="container-fluid">
+        <div class="container">
+            <div class="row">
+                <div class="col"><h1>Тренди у голосуваннях</h1></div>
+            </div>
+        </div>
         <div class="row">
             <div class="col-12">
                 <div id="votes-trend" class="bar-chart"></div>
@@ -224,6 +224,7 @@
                 <div id="theme-trend" class="bar-chart"></div>
                 <div id="theme-trend-percent" class="bar-chart"></div>
                 <div id="decision-trend" class="bar-chart"></div>
+                <div id="land-trend" class="bar-chart"></div>
             </div>
         </div>
     </div>
@@ -427,6 +428,8 @@
             drawColumnChart(drawingData.resultsByMonthByCategoryData().columns, drawingData.resultsByMonthByCategoryData().rows, "theme-trend-percent", "right", true)
 
             drawLineChart(drawingData.resultByMonthChartData().columns, drawingData.resultByMonthChartData().rows, "decision-trend")
+
+            drawColumnChart(drawingData.landCategoryByMonthChartData().columns, drawingData.landCategoryByMonthChartData().rows, "land-trend", "right")
 
             // draw table for selected period
             let tables = document.getElementById("details-tables")
