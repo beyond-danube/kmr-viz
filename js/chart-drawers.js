@@ -413,6 +413,55 @@ function getDrawingData(categotyVotingData) {
             let sortedDataElements = sortDataByYearAndMonth(dataElements)
 
             return { columns: resultColumnsByMonth, rows: sortedDataElements }
+        },
+        landCategoryByMonthChartData: () => {
+            
+            let resultColumnsByMonth = [ ]
+            resultColumnsByMonth.push(['string', 'місяць'])
+
+            for (const category of themeToCategoryMap.LAND) {
+                resultColumnsByMonth.push(['number', category])
+            }
+
+            let dataElements = []
+
+            let dataByYearAndMonth = {}
+
+
+            for (const category of themeToCategoryMap.LAND) {
+                if(categotyVotingData.hasOwnProperty(category)) {
+                    for (const entry in categotyVotingData[category]) {
+
+                        let yearAndMonth = `20${categotyVotingData[category][entry].docId.substring(0, 2)}-${categotyVotingData[category][entry].docId.substring(2, 4)}`
+    
+                        if(!dataByYearAndMonth.hasOwnProperty(yearAndMonth)) {
+                            dataByYearAndMonth[yearAndMonth] = {}
+                            for (const categoryItem in themeToCategoryMap.LAND) {
+                                dataByYearAndMonth[yearAndMonth][themeToCategoryMap.LAND[categoryItem]] = 0
+                            }
+                        }
+                        
+                        dataByYearAndMonth[yearAndMonth][category]++
+                    }
+                }
+                
+            }
+
+            for (const yearMonth in dataByYearAndMonth) {
+                let dataKey = [ yearMonth ]
+                let dataValues = []
+
+                for (const categoryValue in dataByYearAndMonth[yearMonth]) {
+                    dataValues.push(dataByYearAndMonth[yearMonth][categoryValue])
+                }
+
+                let dataElement = dataKey.concat(dataValues)
+                dataElements.push(dataElement)
+            }
+
+            let sortedDataElements = sortDataByYearAndMonth(dataElements)
+
+            return { columns: resultColumnsByMonth, rows: sortedDataElements }
         }
 
     }
