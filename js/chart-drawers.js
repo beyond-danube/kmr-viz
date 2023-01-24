@@ -224,6 +224,36 @@ function getDrawingData(categotyVotingData) {
         })
     }
 
+    const pieCharColumns = [['string', 'Результат'], ['number', 'Число']]
+
+    function addMissingMonthInSelectedRange(yearMonthObject) {
+        let yearMonth = {}
+
+        for (const key in yearMonthObject) {
+            let year = key.split('-')[0]
+            let month = parseInt(key.split('-')[1])
+
+            if(!yearMonth.hasOwnProperty(year)) {
+                yearMonth[year] = { min: month, max: month }
+            } else {
+                yearMonth[year].min = month < yearMonth[year].min ? month : yearMonth[year].min
+                yearMonth[year].max = month > yearMonth[year].max ? month : yearMonth[year].max
+            }
+        }
+
+        for (const key in yearMonth) {
+            for (let i = yearMonth[key].min + 1; i < yearMonth[key].max; i++) {
+
+                let prop = `${key}-${i.toString().length === 1 ? '0' + i : i}`
+                if(!yearMonthObject.hasOwnProperty(prop)) {
+                    yearMonthObject[prop] = {}
+                }
+            }
+        }
+
+        return yearMonthObject
+    }
+
     return {
         voteChartData: () => { 
             let dataElements = []
@@ -445,6 +475,16 @@ function getDrawingData(categotyVotingData) {
                     }
                 }
                 
+            }
+
+            dataByYearAndMonth = addMissingMonthInSelectedRange(dataByYearAndMonth)
+
+            for (const yearMonth in dataByYearAndMonth) {
+                if(Object.keys(dataByYearAndMonth[yearMonth]).length === 0) {
+                    for (const categoryItem in themeToCategoryMap.LAND) {
+                        dataByYearAndMonth[yearMonth][themeToCategoryMap.LAND[categoryItem]] = 0
+                    }
+                }
             }
 
             for (const yearMonth in dataByYearAndMonth) {
