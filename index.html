@@ -224,6 +224,15 @@
                 <div id="theme-trend" class="bar-chart"></div>
                 <div id="theme-trend-percent" class="bar-chart"></div>
                 <div id="decision-trend" class="bar-chart"></div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col"><h1>Окремо про земельні ділянки</h1></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
                 <div id="land-trend" class="bar-chart"></div>
             </div>
         </div>
@@ -416,20 +425,20 @@
             let drawingData = getDrawingData(votesByCategory)
 
             // draw pie charts for overall selecetd period
-            drawPieChart(drawingData.voteChartData().columns, drawingData.voteChartData().rows, "votes-distributon")
-            drawPieChart(drawingData.resultChartData().columns, drawingData.resultChartData().rows, "results-distributon")
-            drawPieChart(drawingData.resultsByCategoryData().columns, drawingData.resultsByCategoryData().rowsYes, "results-category-yes")
-            drawPieChart(drawingData.resultsByCategoryData().columns, drawingData.resultsByCategoryData().rowsNo, "results-category-no")
+            drawPieChart(drawingData.voteChartData.columns(), drawingData.voteChartData.rows(), "votes-distributon")
+            drawPieChart(drawingData.resultChartData.columns(), drawingData.resultChartData.rows(), "results-distributon")
+            drawPieChart(drawingData.resultsByCategoryData.columns(), drawingData.resultsByCategoryData.rowsYes(), "results-category-yes")
+            drawPieChart(drawingData.resultsByCategoryData.columns(), drawingData.resultsByCategoryData.rowsNo(), "results-category-no")
 
             // draw columns and line charts by month for selected period
-            drawColumnChart(drawingData.votesByMonthChartData().columns, drawingData.votesByMonthChartData().rows, "votes-trend", "bottom")
-            drawColumnChart(drawingData.votesByMonthChartData().columns, drawingData.votesByMonthChartData().rows, "votes-trend-percent", "bottom", true)
-            drawColumnChart(drawingData.resultsByMonthByCategoryData().columns, drawingData.resultsByMonthByCategoryData().rows, "theme-trend", "right")
-            drawColumnChart(drawingData.resultsByMonthByCategoryData().columns, drawingData.resultsByMonthByCategoryData().rows, "theme-trend-percent", "right", true)
+            drawColumnChart(drawingData.votesByMonthChartData.columns(), drawingData.votesByMonthChartData.rows(), "votes-trend", "bottom")
+            drawColumnChart(drawingData.votesByMonthChartData.columns(), drawingData.votesByMonthChartData.rows(), "votes-trend-percent", "bottom", true)
+            drawColumnChart(drawingData.resultsByMonthByCategoryData.columns(), drawingData.resultsByMonthByCategoryData.rows(), "theme-trend", "right")
+            drawColumnChart(drawingData.resultsByMonthByCategoryData.columns(), drawingData.resultsByMonthByCategoryData.rows(), "theme-trend-percent", "right", true)
 
-            drawLineChart(drawingData.resultByMonthChartData().columns, drawingData.resultByMonthChartData().rows, "decision-trend")
+            drawLineChart(drawingData.resultByMonthChartData.columns(), drawingData.resultByMonthChartData.rows(), "decision-trend")
 
-            drawColumnChart(drawingData.landCategoryByMonthChartData().columns, drawingData.landCategoryByMonthChartData().rows, "land-trend", "right")
+            drawColumnChart(drawingData.landCategoryByMonthChartData.columns(), drawingData.landCategoryByMonthChartData.rows(), "land-trend", "right")
 
             // draw table for selected period
             let tables = document.getElementById("details-tables")

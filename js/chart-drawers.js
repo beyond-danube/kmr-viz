@@ -255,253 +255,298 @@ function getDrawingData(categotyVotingData) {
     }
 
     return {
-        voteChartData: () => { 
-            let dataElements = []
+        voteChartData: { 
+            columns: () => { return pieCharColumns }, 
+            rows: () => {
+                let dataElements = []
 
-            for (const voteKey in voteOptions) {
-                let total = 0
-
-                flatViewData.forEach(entry => total = total + entry[voteToCountMap[voteKey]])
-                dataElements.push([ voteOptions[voteKey], total ])
-            }
-
-            return { columns: [['string', 'Голос'], ['number', 'Число']], rows: dataElements }
-        },
-        resultChartData: () => {
-            let dataElements = []
-
-            for (const resultKey in resultOptions) {
-                dataElements.push([ resultOptions[resultKey], flatViewData.filter(res => res.RESULT === resultOptions[resultKey]).length ])
-            }
-
-            return { columns: [['string', 'Результат'], ['number', 'Число']], rows: dataElements }
-        },
-        resultsByCategoryData: () => {
-            let dataElements = {}
-
-            for (const resultKey in resultOptions) {
-                dataElements[resultOptions[resultKey]] = []
-            }
-
-            for (const resultKey in resultOptions) { 
-
-                for (const theme in themeToCategoryMap) {
+                for (const voteKey in voteOptions) {
                     let total = 0
-                    themeToCategoryMap[theme].forEach(themeItem => categotyVotingData.hasOwnProperty(themeItem) ? total = total + categotyVotingData[themeItem].filter(item => item.RESULT === resultOptions[resultKey]).length : total = total)
-
-                    dataElements[resultOptions[resultKey]].push( [ readableThemeMap[theme], total ] )
+    
+                    flatViewData.forEach(entry => total = total + entry[voteToCountMap[voteKey]])
+                    dataElements.push([ voteOptions[voteKey], total ])
                 }
-            }
-            return { columns: [['string', 'Тема'], ['number', 'Число']], rowsYes: dataElements[resultOptions.YES], rowsNo: dataElements[resultOptions.NO] }
+
+                return dataElements
+            } 
         },
-        votesByMonthChartData: () => {
-            let votesByMonthColumns = []
+        resultChartData: { 
+            columns: () => { return pieCharColumns }, 
+            rows: () => {
+                let dataElements = []
 
-            votesByMonthColumns.push(['string', 'місяць'])
+                for (const resultKey in resultOptions) {
+                    dataElements.push([ resultOptions[resultKey], flatViewData.filter(res => res.RESULT === resultOptions[resultKey]).length ])
+                }
 
-            for (const voteOption in voteOptions) {
-                votesByMonthColumns.push(['number', voteOptions[voteOption]])      
-            }
+                return dataElements
+            } 
+        },
+        resultsByCategoryData: { 
+            columns: () => { return pieCharColumns }, 
+            rowsYes: () => { 
+                let dataElements = {}
 
-            let dataElements = []
-
-            let dataByYearAndMonth = {}
-
-            flatViewData.forEach(entry => {
-
-                let yearAndMonth = `20${entry.docId.substring(0, 2)}-${entry.docId.substring(2, 4)}`
-
-                if(!dataByYearAndMonth.hasOwnProperty(yearAndMonth)) {
-                    dataByYearAndMonth[yearAndMonth] = {}
-                    for (const voteOption in voteOptions) {
-                        dataByYearAndMonth[yearAndMonth][voteOptions[voteOption]] = 0
+                for (const resultKey in resultOptions) {
+                    dataElements[resultOptions[resultKey]] = []
+                }
+    
+                for (const resultKey in resultOptions) { 
+    
+                    for (const theme in themeToCategoryMap) {
+                        let total = 0
+                        themeToCategoryMap[theme].forEach(themeItem => categotyVotingData.hasOwnProperty(themeItem) ? total = total + categotyVotingData[themeItem].filter(item => item.RESULT === resultOptions[resultKey]).length : total = total)
+    
+                        dataElements[resultOptions[resultKey]].push( [ readableThemeMap[theme], total ] )
                     }
                 }
 
-                for (const key in voteToCountMap) {
-                    dataByYearAndMonth[yearAndMonth][voteOptions[key]] += entry[voteToCountMap[key]]
+                return dataElements[resultOptions.YES]
+            }, 
+            rowsNo: () => {
+                let dataElements = {}
+
+                for (const resultKey in resultOptions) {
+                    dataElements[resultOptions[resultKey]] = []
                 }
-                
-            })
-
-            for (const yearMonth in dataByYearAndMonth) {
-                let dataKey = [ yearMonth ]
-                let dataValues = []
-
-                for (const voteValue in dataByYearAndMonth[yearMonth]) {
-                    dataValues.push(dataByYearAndMonth[yearMonth][voteValue])
+    
+                for (const resultKey in resultOptions) { 
+    
+                    for (const theme in themeToCategoryMap) {
+                        let total = 0
+                        themeToCategoryMap[theme].forEach(themeItem => categotyVotingData.hasOwnProperty(themeItem) ? total = total + categotyVotingData[themeItem].filter(item => item.RESULT === resultOptions[resultKey]).length : total = total)
+    
+                        dataElements[resultOptions[resultKey]].push( [ readableThemeMap[theme], total ] )
+                    }
                 }
 
-                let dataElement = dataKey.concat(dataValues)
-                dataElements.push(dataElement)
+                return dataElements[resultOptions.NO]
             }
-
-            let sortedDataElements = sortDataByYearAndMonth(dataElements)
-
-            return { columns: votesByMonthColumns, rows: sortedDataElements }
         },
-        resultsByMonthByCategoryData: () => {
-            let resultsByMonthByCategoryColumns = []
+        votesByMonthChartData: {
+            columns: () => { 
+                let votesByMonthColumns = []
 
-            resultsByMonthByCategoryColumns.push(['string', 'місяць'])
+                votesByMonthColumns.push(['string', 'місяць'])
+    
+                for (const voteOption in voteOptions) {
+                    votesByMonthColumns.push(['number', voteOptions[voteOption]])      
+                }
 
-            for (const themeName in readableThemeMap) {
-                resultsByMonthByCategoryColumns.push(['number', readableThemeMap[themeName]])
-            }
+                return votesByMonthColumns
+            },
+            rows: () => {
+                let dataElements = []
 
-            let dataElements = []
-
-            let dataByYearAndMonth = {}
-
-            for (const category in categotyVotingData) {
-                for (const entry in categotyVotingData[category]) {
-
-                    let yearAndMonth = `20${categotyVotingData[category][entry].docId.substring(0, 2)}-${categotyVotingData[category][entry].docId.substring(2, 4)}`
-
+                let dataByYearAndMonth = {}
+    
+                flatViewData.forEach(entry => {
+    
+                    let yearAndMonth = `20${entry.docId.substring(0, 2)}-${entry.docId.substring(2, 4)}`
+    
                     if(!dataByYearAndMonth.hasOwnProperty(yearAndMonth)) {
                         dataByYearAndMonth[yearAndMonth] = {}
-                        for (const themeName in readableThemeMap) {
-                            dataByYearAndMonth[yearAndMonth][readableThemeMap[themeName]] = 0
+                        for (const voteOption in voteOptions) {
+                            dataByYearAndMonth[yearAndMonth][voteOptions[voteOption]] = 0
                         }
+                    }
+    
+                    for (const key in voteToCountMap) {
+                        dataByYearAndMonth[yearAndMonth][voteOptions[key]] += entry[voteToCountMap[key]]
                     }
                     
-                    for (const theme in themeToCategoryMap) {
-                        for (const categortyName in themeToCategoryMap[theme]) {
-                            if(themeToCategoryMap[theme][categortyName] === category) dataByYearAndMonth[yearAndMonth][readableThemeMap[[theme]]]++
-                        }
+                })
+    
+                for (const yearMonth in dataByYearAndMonth) {
+                    let dataKey = [ yearMonth ]
+                    let dataValues = []
+    
+                    for (const voteValue in dataByYearAndMonth[yearMonth]) {
+                        dataValues.push(dataByYearAndMonth[yearMonth][voteValue])
                     }
+    
+                    let dataElement = dataKey.concat(dataValues)
+                    dataElements.push(dataElement)
                 }
+    
+                let sortedDataElements = sortDataByYearAndMonth(dataElements)
+
+                return sortedDataElements
             }
-
-            for (const yearMonth in dataByYearAndMonth) {
-                let dataKey = [ yearMonth ]
-                let dataValues = []
-
-                for (const voteValue in dataByYearAndMonth[yearMonth]) {
-                    dataValues.push(dataByYearAndMonth[yearMonth][voteValue])
-                }
-
-                let dataElement = dataKey.concat(dataValues)
-                dataElements.push(dataElement)
-            }
-
-            let sortedDataElements = sortDataByYearAndMonth(dataElements)
-
-            return { columns: resultsByMonthByCategoryColumns, rows: sortedDataElements }
         },
-        resultByMonthChartData: () => {
+        resultsByMonthByCategoryData: {
+            columns: () => {
+                let resultsByMonthByCategoryColumns = []
 
-            let resultColumnsByMonth = []
-            resultColumnsByMonth.push(['string', 'місяць'])
-
-            for (const resultOption in resultOptions) {
-                resultColumnsByMonth.push(['number', resultOptions[resultOption]])      
-            }
-
-            let dataElements = []
-
-            let dataByYearAndMonth = {}
-
-            flatViewData.forEach(entry => {
-
-                let yearAndMonth = `20${entry.docId.substring(0, 2)}-${entry.docId.substring(2, 4)}`
+                resultsByMonthByCategoryColumns.push(['string', 'місяць'])
     
-                if(!dataByYearAndMonth.hasOwnProperty(yearAndMonth)) {
-                    dataByYearAndMonth[yearAndMonth] = {}
-                    for (const resultOption in resultOptions) {
-                        dataByYearAndMonth[yearAndMonth][resultOptions[resultOption]] = 0
-                    }
+                for (const themeName in readableThemeMap) {
+                    resultsByMonthByCategoryColumns.push(['number', readableThemeMap[themeName]])
                 }
+
+                return resultsByMonthByCategoryColumns
+            },
+            rows: () => {
+                let dataElements = []
+
+                let dataByYearAndMonth = {}
     
-                switch (entry.RESULT) {
-                    case resultOptions.YES:
-                        dataByYearAndMonth[yearAndMonth][resultOptions.YES]++
-                        break
-    
-                    case resultOptions.NO:
-                        dataByYearAndMonth[yearAndMonth][resultOptions.NO]++
-                        break
-            
-                    default:
-                        break
-                }
-                
-            })
-    
-            for (const yearMonth in dataByYearAndMonth) {
-                let dataKey = [ yearMonth ]
-                let dataValues = []
-    
-                for (const resultValue in dataByYearAndMonth[yearMonth]) {
-                    dataValues.push(dataByYearAndMonth[yearMonth][resultValue])
-                }
-    
-                let dataElement = dataKey.concat(dataValues)
-                dataElements.push(dataElement)
-            }
-
-            let sortedDataElements = sortDataByYearAndMonth(dataElements)
-
-            return { columns: resultColumnsByMonth, rows: sortedDataElements }
-        },
-        landCategoryByMonthChartData: () => {
-            
-            let resultColumnsByMonth = [ ]
-            resultColumnsByMonth.push(['string', 'місяць'])
-
-            for (const category of themeToCategoryMap.LAND) {
-                resultColumnsByMonth.push(['number', category])
-            }
-
-            let dataElements = []
-
-            let dataByYearAndMonth = {}
-
-
-            for (const category of themeToCategoryMap.LAND) {
-                if(categotyVotingData.hasOwnProperty(category)) {
+                for (const category in categotyVotingData) {
                     for (const entry in categotyVotingData[category]) {
-
+    
                         let yearAndMonth = `20${categotyVotingData[category][entry].docId.substring(0, 2)}-${categotyVotingData[category][entry].docId.substring(2, 4)}`
     
                         if(!dataByYearAndMonth.hasOwnProperty(yearAndMonth)) {
                             dataByYearAndMonth[yearAndMonth] = {}
-                            for (const categoryItem in themeToCategoryMap.LAND) {
-                                dataByYearAndMonth[yearAndMonth][themeToCategoryMap.LAND[categoryItem]] = 0
+                            for (const themeName in readableThemeMap) {
+                                dataByYearAndMonth[yearAndMonth][readableThemeMap[themeName]] = 0
                             }
                         }
                         
-                        dataByYearAndMonth[yearAndMonth][category]++
+                        for (const theme in themeToCategoryMap) {
+                            for (const categortyName in themeToCategoryMap[theme]) {
+                                if(themeToCategoryMap[theme][categortyName] === category) dataByYearAndMonth[yearAndMonth][readableThemeMap[[theme]]]++
+                            }
+                        }
                     }
                 }
+    
+                for (const yearMonth in dataByYearAndMonth) {
+                    let dataKey = [ yearMonth ]
+                    let dataValues = []
+    
+                    for (const voteValue in dataByYearAndMonth[yearMonth]) {
+                        dataValues.push(dataByYearAndMonth[yearMonth][voteValue])
+                    }
+    
+                    let dataElement = dataKey.concat(dataValues)
+                    dataElements.push(dataElement)
+                }
+    
+                let sortedDataElements = sortDataByYearAndMonth(dataElements)
+
+                return sortedDataElements
+            }
+        },
+        resultByMonthChartData: {
+            columns: () => {
+                let resultColumnsByMonth = []
+                resultColumnsByMonth.push(['string', 'місяць'])
+    
+                for (const resultOption in resultOptions) {
+                    resultColumnsByMonth.push(['number', resultOptions[resultOption]])      
+                }
+
+                return resultColumnsByMonth
+            },
+            rows: () => {
+                let dataElements = []
+
+                let dataByYearAndMonth = {}
+    
+                flatViewData.forEach(entry => {
+    
+                    let yearAndMonth = `20${entry.docId.substring(0, 2)}-${entry.docId.substring(2, 4)}`
+        
+                    if(!dataByYearAndMonth.hasOwnProperty(yearAndMonth)) {
+                        dataByYearAndMonth[yearAndMonth] = {}
+                        for (const resultOption in resultOptions) {
+                            dataByYearAndMonth[yearAndMonth][resultOptions[resultOption]] = 0
+                        }
+                    }
+        
+                    switch (entry.RESULT) {
+                        case resultOptions.YES:
+                            dataByYearAndMonth[yearAndMonth][resultOptions.YES]++
+                            break
+        
+                        case resultOptions.NO:
+                            dataByYearAndMonth[yearAndMonth][resultOptions.NO]++
+                            break
                 
+                        default:
+                            break
+                    }
+                    
+                })
+        
+                for (const yearMonth in dataByYearAndMonth) {
+                    let dataKey = [ yearMonth ]
+                    let dataValues = []
+        
+                    for (const resultValue in dataByYearAndMonth[yearMonth]) {
+                        dataValues.push(dataByYearAndMonth[yearMonth][resultValue])
+                    }
+        
+                    let dataElement = dataKey.concat(dataValues)
+                    dataElements.push(dataElement)
+                }
+    
+                let sortedDataElements = sortDataByYearAndMonth(dataElements)
+
+                return  sortedDataElements
             }
+        },
+        landCategoryByMonthChartData: {
+            columns: () => {
+                let resultColumnsByMonth = [ ]
+                resultColumnsByMonth.push(['string', 'місяць'])
 
-            dataByYearAndMonth = addMissingMonthInSelectedRange(dataByYearAndMonth)
+                for (const category of themeToCategoryMap.LAND) {
+                    resultColumnsByMonth.push(['number', category])
+                }
+                return resultColumnsByMonth
+            }, rows: () => {
+                let dataElements = []
 
-            for (const yearMonth in dataByYearAndMonth) {
-                if(Object.keys(dataByYearAndMonth[yearMonth]).length === 0) {
-                    for (const categoryItem in themeToCategoryMap.LAND) {
-                        dataByYearAndMonth[yearMonth][themeToCategoryMap.LAND[categoryItem]] = 0
+                let dataByYearAndMonth = {}
+    
+    
+                for (const category of themeToCategoryMap.LAND) {
+                    if(categotyVotingData.hasOwnProperty(category)) {
+                        for (const entry in categotyVotingData[category]) {
+    
+                            let yearAndMonth = `20${categotyVotingData[category][entry].docId.substring(0, 2)}-${categotyVotingData[category][entry].docId.substring(2, 4)}`
+        
+                            if(!dataByYearAndMonth.hasOwnProperty(yearAndMonth)) {
+                                dataByYearAndMonth[yearAndMonth] = {}
+                                for (const categoryItem in themeToCategoryMap.LAND) {
+                                    dataByYearAndMonth[yearAndMonth][themeToCategoryMap.LAND[categoryItem]] = 0
+                                }
+                            }
+                            
+                            dataByYearAndMonth[yearAndMonth][category]++
+                        }
+                    }
+                    
+                }
+    
+                dataByYearAndMonth = addMissingMonthInSelectedRange(dataByYearAndMonth)
+    
+                for (const yearMonth in dataByYearAndMonth) {
+                    if(Object.keys(dataByYearAndMonth[yearMonth]).length === 0) {
+                        for (const categoryItem in themeToCategoryMap.LAND) {
+                            dataByYearAndMonth[yearMonth][themeToCategoryMap.LAND[categoryItem]] = 0
+                        }
                     }
                 }
-            }
-
-            for (const yearMonth in dataByYearAndMonth) {
-                let dataKey = [ yearMonth ]
-                let dataValues = []
-
-                for (const categoryValue in dataByYearAndMonth[yearMonth]) {
-                    dataValues.push(dataByYearAndMonth[yearMonth][categoryValue])
+    
+                for (const yearMonth in dataByYearAndMonth) {
+                    let dataKey = [ yearMonth ]
+                    let dataValues = []
+    
+                    for (const categoryValue in dataByYearAndMonth[yearMonth]) {
+                        dataValues.push(dataByYearAndMonth[yearMonth][categoryValue])
+                    }
+    
+                    let dataElement = dataKey.concat(dataValues)
+                    dataElements.push(dataElement)
                 }
+    
+                let sortedDataElements = sortDataByYearAndMonth(dataElements)
 
-                let dataElement = dataKey.concat(dataValues)
-                dataElements.push(dataElement)
+                return sortedDataElements
             }
-
-            let sortedDataElements = sortDataByYearAndMonth(dataElements)
-
-            return { columns: resultColumnsByMonth, rows: sortedDataElements }
         }
 
     }
