@@ -202,6 +202,7 @@ function guessCategory(topic) {
 
     // Перейменування
     else if (topic.includes('перейменування вулиці') || topic.includes('перейменування площі') || topic.includes('перейменування бульвару') || topic.includes('перейменування провулку') || topic.includes('перейменування проспекту') || topic.includes('всі питання перейменувань')) return 'Перейменування'
+    else if (topic.includes('повернення історичної назви')) return 'Перейменування'
 
 
     else return 'Інша категорія'
