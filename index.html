@@ -16,6 +16,7 @@
     <script type="text/javascript" src="js/chart-drawers.js"></script>
     <script type="text/javascript" src="js/drawing-constants.js"></script>
     <script type="text/javascript" src="js/table-drawer.js"></script>
+    <script type="text/javascript" src="js/table-named-drawer.js"></script>
 
     <!-- <link rel="stylesheet" href="css/main.css"> -->
 
@@ -239,6 +240,22 @@
             </div>
         </div>
     </div>
+
+    <div class="container">
+        <h1>Хто найчастіше не зʼявляється</h1>
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="named-table-checkbox" checked>
+        </div>
+        <br>
+        <p id="named-legend">
+            🙋‍♂️ За<br>
+            🙅‍♀️ Проти<br>
+            🤷 Утримався<br>
+            👤 Не голосував<br>
+            🥷 Відсутній<br>
+        </p>
+    </div>
+    <div class="container" id="named-table"></div>
     <div class="container">
         <h1>Всі рішення списком</h1>
         <div class="form-check form-switch">
@@ -254,8 +271,7 @@
             📑 Рішення
         </p>
     </div>
-    <div class="container-fluid" id="details-tables">
-    </div>
+    <div class="container-fluid" id="details-tables"></div>
 
     
 
@@ -290,6 +306,8 @@
         let checkbox = document.getElementById("hideTechWorkCheckbox")
 
         let detailsTableCheckbox = document.getElementById("all-documents-table-checkbox")
+
+        let namedTableCheckbox = document.getElementById("named-table-checkbox")
 
         function drawLoadProgress() {
             if(loadedDocs.current < loadedDocs.total) {
@@ -447,11 +465,29 @@
             tables.innerHTML = ''
 
             createThemeTables(votesByCategory)
+
+            let namedTable = document.getElementById("named-table")
+            namedTable.innerHTML = ''
+
+            drawDpGolosTable(votesByCategory)
         }
 
         detailsTableCheckbox.addEventListener('click', () => {
             let legend = document.getElementById("legend")
             let tables = document.getElementById("details-tables")
+
+            if(legend.hidden != true) {
+                legend.hidden = true
+                tables.hidden = true
+            } else {
+                legend.hidden = false
+                tables.hidden = false
+            }
+        })
+
+        namedTableCheckbox.addEventListener('click', () => {
+            let legend = document.getElementById("named-legend")
+            let tables = document.getElementById("named-table")
 
             if(legend.hidden != true) {
                 legend.hidden = true

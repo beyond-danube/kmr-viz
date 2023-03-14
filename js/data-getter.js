@@ -18,5 +18,5 @@ async function getDataFile(fileName) {
 }
 
 async function getMonthDataFile(fileName) {
-    return await fetchData(`${BASE_URL}data-final-lite-month/${fileName}`)
+    return await fetchData(`${BASE_URL}data-final-month/${fileName}`)
 }
