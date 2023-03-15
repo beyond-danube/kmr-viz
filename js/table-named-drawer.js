@@ -164,7 +164,7 @@ function drawDpGolosTable(categoryVoting) {
     let resultColumn = document.createElement('th')
     resultColumn.setAttribute('scope', 'col')
     resultColumn.setAttribute('class', 'rotate')
-    resultColumn.innerHTML = '🥷 (%)'
+    resultColumn.innerHTML = '🥷\xa0(%)'
     headTr.appendChild(resultColumn)
 
 

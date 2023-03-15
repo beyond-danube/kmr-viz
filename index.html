@@ -255,7 +255,7 @@
             🥷 Відсутній<br>
         </p>
     </div>
-    <div class="container">
+    <div class="container" id="named-tables">
         <h4>Персонально</h4>
         <p>рейтинг за абсолютною кількісью</p>
         <div class="container" id="named-table"></div>
@@ -499,7 +499,7 @@
 
         namedTableCheckbox.addEventListener('click', () => {
             let legend = document.getElementById("named-legend")
-            let tables = document.getElementById("named-table")
+            let tables = document.getElementById("named-tables")
 
             if(legend.hidden != true) {
                 legend.hidden = true
