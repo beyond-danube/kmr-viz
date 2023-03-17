@@ -20,3 +20,7 @@ async function getDataFile(fileName) {
 async function getMonthDataFile(fileName) {
     return await fetchData(`${BASE_URL}data-final-month/${fileName}`)
 }
+
+async function checkCountry() {
+    return (await fetchData('https://json.geoiplookup.io/')).country_code
+}

@@ -62,6 +62,8 @@
 
     <meta property="og:image" content="img/preview.png">
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+
 </head>
 
 <body>
@@ -331,6 +333,8 @@
 
         let datarows
 
+        let country
+
         let loadedDocs = { current: 0, total: 0 }
 
         let checkbox = document.getElementById("hideTechWorkCheckbox")
@@ -445,8 +449,15 @@
         }
 
         window.addEventListener('load', async () => { 
-            dataFiles = await getDateMapByMonth()
-            await drawAllCharts()
+
+            country = await checkCountry()
+
+            if(country !== 'RU') {
+                dataFiles = await getDateMapByMonth()
+                await drawAllCharts()
+            } else {
+                clearBody()
+            }
         })
 
         submitButton.addEventListener('click', async () => {
@@ -532,6 +543,11 @@
                 tables.hidden = false
             }
         })
+
+        function clearBody() {
+            let body = document.getElementsByTagName("body")[0]
+            body.innerHTML = ''
+        }
         
 
     </script>
