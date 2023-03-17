@@ -452,7 +452,7 @@
 
             country = await checkCountry()
 
-            if(country !== 'RU') {
+            if(country !== 'RU' && country !== 'BY') {
                 dataFiles = await getDateMapByMonth()
                 await drawAllCharts()
             } else {
